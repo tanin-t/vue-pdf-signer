@@ -2,8 +2,11 @@
   <div>
     <button @click="dialog = true">Sign</button>
     <button @click="exportPDF()">Export</button>
+    <button @click="zoomIn()">Zoom In</button>
+    <button @click="zoomOut()">Zoom Out</button>
 
-    <div id="pdf-wrapper" style="max-height: 90vh; overflow-y: scroll; overflow-x: hidden;">
+    <!-- <div id="pdf-wrapper" style="max-height: 90vh; overflow-y: scroll; overflow-x: hidden;"> -->
+    <div id="pdf-wrapper">
       <canvas
         style="border: 1px solid blue;"
         id="canvas"
@@ -22,7 +25,35 @@ import { fabric } from 'fabric'
 import { PDFDocumentProxy, PDFPageProxy } from '..'
 import SignatureDialog from './SignatureDialog.vue'
 import { PDFDocument } from 'pdf-lib'
+import { CoordsTranformer } from '@/utils'
+import { isMobile } from '@/utils/device'
+import { drawRulers, setupCanvas } from '@/lib/pdf-canvas'
+import { MobileCanvasController } from '@/lib/pdf-canvas/mobile'
+import { PDFController } from '@/lib/pdf-renderer'
 
+function downloadBlob (blob: Blob, name = 'file.pdf') {
+  // Create a link pointing to the ObjectURL containing the blob.
+  const data = window.URL.createObjectURL(blob)
+
+  const link = document.createElement('a')
+  link.href = data
+  link.download = name
+
+  // this is necessary as link.click() does not work on the latest firefox
+  link.dispatchEvent(
+    new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true,
+      view: window
+    })
+  )
+
+  setTimeout(() => {
+    // For Firefox it is necessary to delay revoking the ObjectURL
+    window.URL.revokeObjectURL(data)
+    link.remove()
+  }, 100)
+}
 function renderPDFPageToCanvas (page: PDFPageProxy): Promise<HTMLCanvasElement> {
   return new Promise((resolve) => {
     //  retina scaling
@@ -69,70 +100,68 @@ function loadPDF (src: string): Promise<fabric.Image[]> {
   })
 }
 
+const deleteIcon = "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' id='Ebene_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='595.275px' height='595.275px' viewBox='200 215 230 470' xml:space='preserve'%3E%3Ccircle style='fill:%23F44336;' cx='299.76' cy='439.067' r='218.516'/%3E%3Cg%3E%3Crect x='267.162' y='307.978' transform='matrix(0.7071 -0.7071 0.7071 0.7071 -222.6202 340.6915)' style='fill:white;' width='65.545' height='262.18'/%3E%3Crect x='266.988' y='308.153' transform='matrix(0.7071 0.7071 -0.7071 0.7071 398.3889 -83.3116)' style='fill:white;' width='65.544' height='262.179'/%3E%3C/g%3E%3C/svg%3E"
+function renderIcon (icon: HTMLElement) {
+  return function renderIcon (ctx: any, left: number, top: number, fabricObject: fabric.Object) {
+    const size = 24
+    ctx.save()
+    ctx.translate(left, top)
+    ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle || 0))
+    ctx.drawImage(icon, -size / 2, -size / 2, size, size)
+    ctx.restore()
+  }
+}
+
 export default Vue.extend({
   components: { SignatureDialog },
+  props: {
+    pdfUrl: {
+      type: String,
+      default: '/example.pdf'
+    }
+  },
   data () {
     return {
-      canvas: null as fabric.Canvas | null,
-      signature: null as fabric.Group | null,
-      dialog: false
+      dialog: false,
+      controller: null as MobileCanvasController | null,
+      canvas: null as fabric.Canvas | null
     }
   },
   mounted () {
-    this.canvas = new fabric.Canvas('canvas')
-    const pdfUrl = 'https://test-media.jeracloud.com/clinic_1/files/before_after/file/e076582f-cbe8-4383-859a-8419500c2028.pdf?Expires=1653918834&Signature=TXnnSymvl7Y4ietUVby-ISW3MbXepfhhIk0zg--S2ZrmARYUiVuubRw-JqUqE9ZpJ36jTyXdHd0FMOA5w57j0iVzNUHQQdMYuBZzshjfd05-Sqq5Ep6Z5alZKut3oIjPocyFAeVDgbIzi1DCavMAncp1F5ItsaIJ-iGtPvA~83aPHD2lTlmCk9qtRwg4cpv1XhHuN5y4D7vwC7JnM1XeD5gV1eHIzyu3YHe~slhu4EieXgjTHKiBX~3PB6nBQ3fA4B9FQH7gZAwiv3HBGlkEMOayrIGvCK68fZZhBQxmN1R-PRmq1AVD8qAoh5zNscfUQYXW0JJp2AzHUwE-pQYkVw__&Key-Pair-Id=APKAJH3DRXDNDEHWYJFA'
-    const wrapper = document.getElementById('pdf-wrapper')
-    if (!wrapper) {
-      return
-    }
-    this.canvas.setWidth(wrapper.offsetWidth - 20)
-    this.canvas.setHeight(1694 * 1 + 100)
-    this.canvas.setBackgroundColor('#eeeeee', console.log)
-    this.loadPdf(this.canvas, pdfUrl)
+    this.controller = setupCanvas('canvas', this.pdfUrl)
+    this.canvas = this.controller.canvas
+
+    setTimeout(() => {
+      if (this.controller && this.controller.canvas) {
+        drawRulers(this.controller.canvas)
+      }
+    }, 1000)
   },
   methods: {
-    async loadPdf (canvas: fabric.Canvas, url: string) {
-      const fbImages = await loadPDF(url)
-      for (let i = 0; i < fbImages.length; i++) {
-        const img = fbImages[i]
-        img.set('top', (img.getScaledHeight() + 10) * i + 50)
-        img.set('selectable', false)
-        canvas.add(img)
-        canvas.centerObjectH(img)
-      }
-    },
-
     insertSignature (signature: fabric.Group) {
-      if (!this.canvas) {
-        alert('Canvas not initialized!')
-        return
-      }
-
-      this.signature = signature
-      this.canvas.add(signature)
+      if (!this.controller) return
+      if (!this.canvas) return
+      this.controller.addSignature(this.canvas, signature)
     },
-
     async exportPDF () {
-      if (!this.signature) {
-        alert('Not signed yet!')
-        return
-      }
+      if (!this.canvas) return
+      const pdfDoc = await PDFController.getPDFDocument(this.pdfUrl)
+      await PDFController.mergeAnnotations(pdfDoc, this.canvas)
 
-      const pdfUrl = 'https://test-media.jeracloud.com/clinic_1/files/before_after/file/e076582f-cbe8-4383-859a-8419500c2028.pdf?Expires=1653918834&Signature=TXnnSymvl7Y4ietUVby-ISW3MbXepfhhIk0zg--S2ZrmARYUiVuubRw-JqUqE9ZpJ36jTyXdHd0FMOA5w57j0iVzNUHQQdMYuBZzshjfd05-Sqq5Ep6Z5alZKut3oIjPocyFAeVDgbIzi1DCavMAncp1F5ItsaIJ-iGtPvA~83aPHD2lTlmCk9qtRwg4cpv1XhHuN5y4D7vwC7JnM1XeD5gV1eHIzyu3YHe~slhu4EieXgjTHKiBX~3PB6nBQ3fA4B9FQH7gZAwiv3HBGlkEMOayrIGvCK68fZZhBQxmN1R-PRmq1AVD8qAoh5zNscfUQYXW0JJp2AzHUwE-pQYkVw__&Key-Pair-Id=APKAJH3DRXDNDEHWYJFA'
-      const existingPdfBytes = await fetch(pdfUrl).then(res => res.arrayBuffer())
-      const pdfDoc = await PDFDocument.load(existingPdfBytes)
+      const pdfBytes = await pdfDoc.save()
+      const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' })
+      console.log(pdfBlob)
 
-      const pngUrl = this.signature.toDataURL({})
-      console.log(pngUrl)
-      const pngImageBytes = await fetch(pngUrl).then((res) => res.arrayBuffer())
-      const pngImage = await pdfDoc.embedPng(pngImageBytes)
-
-      const page = pdfDoc.getPage(0)
-      page.drawImage(pngImage, { x: 0, y: 0, width: pngImage.width, height: pngImage.height })
-
-      // const pdfBytes = await pdfDoc.save()
-      const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true })
-      console.log(pdfDataUri)
+      const url = window.URL.createObjectURL(pdfBlob)
+      window.open(url, '_blank')
+    },
+    zoomIn () {
+      if (!this.canvas) return
+      this.controller?.zoomIn(this.canvas)
+    },
+    zoomOut () {
+      if (!this.canvas) return
+      this.controller?.zoomOut(this.canvas)
     }
   }
 })

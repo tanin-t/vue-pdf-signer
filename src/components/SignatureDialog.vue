@@ -10,10 +10,11 @@
       </div>
       <hr class="my-0">
       <div style="display: flex; justify-content: center; padding-top: 25px; padding-bottom: 25px;">
-        <canvas id="signature-canvas" width="480" height="240" style="border: 1px dashed black; margin: auto;" />
+        <canvas id="signature-canvas" height="240" style="border: 1px dashed black; margin: auto;" />
       </div>
       <hr class="my-0">
       <div style="background-color: #eeeeee; padding: 20px">
+        <button @click="clear()">Clear</button>
         <button @click="submit()">OK</button>
       </div>
     </div>
@@ -31,7 +32,7 @@ export default Vue.extend({
     },
     width: {
       type: String,
-      default: '650px'
+      default: '90%'
     },
     height: {
       type: String,
@@ -50,16 +51,24 @@ export default Vue.extend({
   },
 
   methods: {
+    clear () {
+      if (!this.canvas) {
+        return
+      }
+      for (const obj of this.canvas?.getObjects()) {
+        this.canvas.remove(obj)
+      }
+    },
     submit () {
       if (!this.canvas) {
         return
       }
       const paths = this.canvas.getObjects()
       const signature = new fabric.Group(paths, {})
-      const dataURL = signature.toDataURL({ width: signature.width, height: signature.height, top: 0, left: 0, format: 'png' })
-      console.log(dataURL)
       this.$emit('submit', signature)
       this.$emit('input', false)
+
+      this.clear()
     }
   }
 })
