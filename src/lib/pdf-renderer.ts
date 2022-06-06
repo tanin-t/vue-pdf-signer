@@ -82,6 +82,7 @@ export class PDFController {
 
       const tr = new PDFDimensionTransformer(fabricPage as fabric.Image, pdfPage)
       for (const sig of pageSignatures) {
+        console.log('sig', sig)
         const pdfImage = await this.getPDFImage(pdfDoc, sig.toDataURL({}))
         const coords = tr.getPDFCoords(sig)
         pdfPage.drawImage(

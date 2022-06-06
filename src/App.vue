@@ -1,20 +1,17 @@
 <template>
   <div id="app">
-    <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <!-- <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/> -->
-    <JeraPDFKit />
+    <pdf-signer pdfUrl="/example.pdf" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-// import HelloWorld from './components/HelloWorld.vue'
-import JeraPDFKit from './components/JeraPDFKit.vue'
+import PdfSigner from './components/pdf-signer.vue'
 
 export default Vue.extend({
   name: 'App',
   components: {
-    JeraPDFKit
+    PdfSigner
   }
 })
 </script>
@@ -27,7 +24,7 @@ export default Vue.extend({
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
-  max-width: 1600px;
+  max-width: 900px;
   margin: auto;
 }
 </style>

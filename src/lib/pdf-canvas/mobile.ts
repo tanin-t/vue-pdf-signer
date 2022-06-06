@@ -1,14 +1,25 @@
 import { FabricObject } from '@/types/fabric'
 import { fabric } from 'fabric'
+import { PDFCanvasController } from '.'
 import { renderPDF } from './common'
+import _ from 'lodash'
 
-export class MobileCanvasController {
-  canvas = null as fabric.Canvas | null
+interface TouchPoint {
+  x: number
+  y: number
+}
+export class MobileCanvasController implements PDFCanvasController {
+  canvas: fabric.Canvas
 
   dragging = {
     isDragging: false,
     lastPosX: 0,
     lastPosY: 0
+  }
+
+  pinching = {
+    isPinching: false,
+    lastDistance: 0
   }
 
   boundary = {
@@ -20,127 +31,217 @@ export class MobileCanvasController {
     zoomOut: 0.1
   }
 
-  setup (canvasId: string, pdfUrl: string) {
-    const canvas = new fabric.Canvas(canvasId)
-    this.canvas = canvas
-    this.setupPanAndZoom(canvas)
-    this.drawPDFPages(canvas, pdfUrl)
-
-    return canvas
+  constructor (canvasId: string) {
+    this.canvas = new fabric.Canvas(canvasId)
   }
 
-  setupPanAndZoom (canvas: fabric.Canvas) {
-    canvas.on('mouse:down', (opt) => {
-      if (canvas.getActiveObject()) {
-        return
-      }
-
-      if (!opt.pointer) {
-        return
-      }
-      const { x, y } = opt.pointer
-
-      canvas.selection = false
-      this.dragging.isDragging = true
-      this.dragging.lastPosX = x
-      this.dragging.lastPosY = y
-    })
-
-    canvas.on('mouse:move', (opt) => {
-      if (!opt.pointer) {
-        return
-      }
-      if (!this.dragging.isDragging) {
-        return
-      }
-
-      const { x, y } = opt.pointer
-      const vpt = canvas.viewportTransform
-      if (vpt) {
-        const zoom = canvas.getZoom()
-        const vpt4 = vpt[4] + (x - this.dragging.lastPosX)
-        const vpt5 = vpt[5] + (y - this.dragging.lastPosY)
-        const tl = { x: -vpt4 / zoom, y: -vpt5 / zoom }
-        const br = { x: (canvas.getWidth() - vpt4) / zoom, y: (canvas.getHeight() - vpt5) / zoom }
-
-        console.log(this.boundary)
-
-        if (tl.x > this.boundary.left && br.x < this.boundary.right) {
-          vpt[4] = vpt4
-        }
-        if (tl.y > this.boundary.top && br.y < this.boundary.bottom) {
-          vpt[5] = vpt5
-        }
-      }
-      canvas.requestRenderAll()
-      this.dragging.lastPosX = x
-      this.dragging.lastPosY = y
-    })
-
-    canvas.on('mouse:up', () => {
-      // on mouse up we want to recalculate new interaction
-      // for all objects, so we call setViewportTransform
-      if (canvas.viewportTransform) {
-        canvas.setViewportTransform(canvas.viewportTransform)
-        canvas.selection = true
-        this.dragging.isDragging = false
-      }
-    })
-  }
-
-  async drawPDFPages (canvas: fabric.Canvas, pdfUrl: string) {
-    const wrapper = canvas.getElement().parentElement?.parentElement
-    console.log(wrapper)
-    if (!wrapper) {
-      throw new Error("Can't find canvas wrapper")
-    }
-    canvas.setWidth(wrapper.offsetWidth)
-    canvas.setHeight(wrapper.offsetWidth * Math.SQRT2)
-    canvas.setBackgroundColor('#eeeeee', console.log)
-
-    const pages = await renderPDF(pdfUrl)
-    for (const page of pages) {
-      (page as never as FabricObject).attrs = { type: 'pdf-page' }
-      canvas.add(page)
-    }
-
-    // Setup panning boundary
-    this.boundary.top = 0
-    this.boundary.left = 0
-    this.boundary.right = pages[0].getScaledWidth()
-    this.boundary.bottom = (pages[0].getScaledHeight() * 1.02) * pages.length
-    this.boundary.zoomOut = (canvas.getWidth() / pages[0].getScaledWidth()) - 0.01
+  async setup (pdfUrl: string) {
+    this.setupCanvasDimensions()
+    const pages = await this.drawPDFPages(pdfUrl)
+    this.setupPanAndZoomBoundary(pages)
+    this.setupPanAndZoomEventHandler()
 
     // Zoom out - fit width
-    canvas.setZoom(this.boundary.zoomOut)
+    this.canvas.setZoom(this.boundary.zoomOut)
 
     // Center page with viewport
     for (const page of pages) {
-      canvas.viewportCenterObjectH(page)
+      this.canvas.viewportCenterObjectH(page)
     }
-    canvas.viewportCenterObject(pages[0])
+    this.canvas.viewportCenterObject(pages[0])
   }
 
-  zoomIn (canvas: fabric.Canvas) {
-    let zoom = canvas.getZoom() + 0.1
+  setupPanAndZoomEventHandler () {
+    if (!this.canvas) {
+      throw new Error('`this.canvas` is not initialized')
+    }
+
+    this.canvas.on('touch:drag', (e) => {
+      console.log('touch:drag', e)
+    })
+
+    this.canvas.on('mouse:move:before', (opt) => {
+      // console.log('mouse:move:before', e)
+      // if (!opt.pointer) {
+      //   throw new Error('`opt` is not TouchEvent')
+      // }
+
+      const evt = opt.e as never as TouchEvent
+      if (evt.touches.length === 2) {
+        const p1 = { x: evt.touches[0].clientX, y: evt.touches[0].clientY }
+        const p2 = { x: evt.touches[1].clientX, y: evt.touches[1].clientY }
+        this.pinchZoom(p1, p2)
+      }
+    })
+
+    this.canvas.on('mouse:down', (opt) => {
+      if (this.canvas.getActiveObject()) {
+        return
+      }
+      if (!opt.pointer) {
+        throw new Error('`opt` is not TouchEvent')
+      }
+
+      const evt = opt.e as never as TouchEvent
+      if (evt.touches.length === 1) {
+        this.canvas.selection = false
+        this.dragging.isDragging = true
+        this.dragging.lastPosX = opt.pointer.x
+        this.dragging.lastPosY = opt.pointer.y
+      }
+
+      if (evt.touches.length === 2) {
+        this.canvas.selection = false
+      }
+    })
+
+    this.canvas.on('mouse:move', (opt) => {
+      if (!opt.pointer) {
+        throw new Error('`opt` is not TouchEvent')
+      }
+
+      const evt = opt.e as never as TouchEvent
+
+      if (evt.touches.length === 1) {
+        if (!this.dragging.isDragging) {
+          return
+        }
+        this.dragPan(opt.pointer)
+      }
+    })
+
+    this.canvas.on('mouse:up', () => {
+      if (!this.canvas) {
+        throw new Error('`this.canvas` is not initialized')
+      }
+
+      // on mouse up we want to recalculate new interaction
+      // for all objects, so we call setViewportTransform
+      if (this.dragging.isDragging && this.canvas.viewportTransform) {
+        this.canvas.setViewportTransform(this.canvas.viewportTransform)
+        this.dragging.isDragging = false
+      }
+
+      this.pinching.lastDistance = 0
+    })
+  }
+
+  dragPan (p: TouchPoint) {
+    const { x, y } = p
+    const vpt = this.canvas.viewportTransform
+    if (vpt) {
+      const zoom = this.canvas.getZoom()
+      vpt[4] = vpt[4] + (x - this.dragging.lastPosX)
+      vpt[5] = vpt[5] + (y - this.dragging.lastPosY)
+      const tl = { x: -vpt[4] / zoom, y: -vpt[5] / zoom }
+      const br = { x: (this.canvas.getWidth() - vpt[4]) / zoom, y: (this.canvas.getHeight() - vpt[5]) / zoom }
+
+      if (tl.x < this.boundary.left) {
+        vpt[4] = -this.boundary.left * zoom
+      }
+      if (br.x > this.boundary.right) {
+        vpt[4] = this.canvas.getWidth() - (this.boundary.right * zoom)
+      }
+
+      if (tl.y < this.boundary.top) {
+        vpt[5] = -this.boundary.top * zoom
+      }
+      if (br.y > this.boundary.bottom) {
+        vpt[5] = this.canvas.getHeight() - (this.boundary.bottom * zoom)
+      }
+    }
+    this.canvas.requestRenderAll()
+    this.dragging.lastPosX = x
+    this.dragging.lastPosY = y
+  }
+
+  pinchZoom (p1: TouchPoint, p2: TouchPoint) {
+    const distance = Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2)
+
+    if (distance && this.pinching.lastDistance) {
+      const delta = distance - this.pinching.lastDistance
+      let zoom = this.canvas.getZoom()
+      zoom *= 0.999 ** (-4 * delta)
+      if (zoom > this.boundary.zoomIn) {
+        zoom = this.boundary.zoomIn
+      }
+      if (zoom < this.boundary.zoomOut) {
+        zoom = this.boundary.zoomOut
+      }
+
+      this.canvas.zoomToPoint(new fabric.Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2), zoom)
+    }
+
+    this.pinching.lastDistance = distance
+  }
+
+  setupCanvasDimensions () {
+    const wrapper = this.canvas.getElement().parentElement?.parentElement
+    if (!wrapper) {
+      throw new Error("Can't find canvas wrapper")
+    }
+    this.canvas.setWidth(wrapper.offsetWidth)
+    this.canvas.setHeight(wrapper.offsetWidth * Math.SQRT2)
+    this.canvas.setBackgroundColor('#eeeeee', console.log)
+  }
+
+  setupPanAndZoomBoundary (pages: fabric.Object[]) {
+    this.boundary.top = 0
+    this.boundary.left = 0
+    this.boundary.right = pages[0].getScaledWidth()
+    this.boundary.bottom = (pages[0].getScaledHeight() * 1.02) * pages.length + 100
+    this.boundary.zoomOut = (this.canvas.getWidth() / pages[0].getScaledWidth())
+  }
+
+  async drawPDFPages (pdfUrl: string) {
+    const pages = await renderPDF(pdfUrl)
+    for (const page of pages) {
+      (page as never as FabricObject).attrs = { type: 'pdf-page' }
+      this.canvas.add(page)
+    }
+
+    return pages
+  }
+
+  zoomIn () {
+    if (!this.canvas) {
+      throw new Error('`this.canvas` is not initialized')
+    }
+
+    let zoom = this.canvas.getZoom() + 0.1
     if (zoom > this.boundary.zoomIn) {
       zoom = this.boundary.zoomIn
     }
-    canvas.setZoom(zoom)
+    this.canvas.setZoom(zoom)
   }
 
-  zoomOut (canvas: fabric.Canvas) {
-    let zoom = canvas.getZoom() - 0.1
+  zoomOut () {
+    if (!this.canvas) {
+      throw new Error('`this.canvas` is not initialized')
+    }
+
+    let zoom = this.canvas.getZoom() - 0.1
     if (zoom < this.boundary.zoomOut) {
       zoom = this.boundary.zoomOut
     }
-    canvas.setZoom(zoom)
+    this.canvas.setZoom(zoom)
   }
 
-  addSignature (canvas: fabric.Canvas, signature: fabric.Group) {
-    (signature as never as FabricObject).attrs = { type: 'signature' }
+  addSignature (signature: fabric.Group) {
+    if (!this.canvas) {
+      throw new Error('`this.canvas` is not initialized')
+    }
 
-    canvas.add(signature)
-    canvas.viewportCenterObject(signature)
+    const sig = signature as never as FabricObject
+    sig.attrs = { type: 'signature' }
+    this.canvas.add(sig)
+    this.canvas.viewportCenterObject(sig)
+  }
+
+  resizeCanvas () {
+    this.setupCanvasDimensions()
+    const pages = this.canvas.getObjects().filter((x) => _.get(x, 'attrs.type') === 'pdf-page')
+    this.setupPanAndZoomBoundary(pages)
+    this.canvas.setZoom(this.boundary.zoomOut)
   }
 }

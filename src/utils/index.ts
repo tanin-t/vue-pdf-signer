@@ -57,8 +57,11 @@ export class PDFDimensionTransformer {
   }
 
   getPDFCoords (obj: fabric.Object): Coords {
-    if (!obj.left || !obj.top || !this.fabricPage.left || !this.fabricPage.top) {
-      throw new Error('obj/canvasPage has not top/left')
+    if (obj.left === undefined || obj.top === undefined) {
+      throw new Error('obj has not top/left')
+    }
+    if (this.fabricPage.left === undefined || this.fabricPage.top === undefined) {
+      throw new Error('fabricPage has not top/left')
     }
 
     const point = {
