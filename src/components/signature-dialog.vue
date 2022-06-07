@@ -1,26 +1,35 @@
 <template>
   <div
     class="dialog"
-    :style="{ display: value ? 'block' : 'none', 'padding-top': fullscreen ? '0' : '120px' }"
+    :style="{ display: value ? 'flex' : 'none' }"
     @click.self="$emit('input', false)"
   >
-    <div class="dialog-body" :style="{ width: cWidth, height: cHeight }">
+    <div class="dialog-body" style="max-width: 440px; max-height: 360px; overflow-y: scroll">
       <div class="dialog-header" @click="$emit('input', false)">
         <h3>Signature</h3>
-
       </div>
       <div class="dialog-content">
-        <div class="signature-canvas-wrapper">
-          <canvas
-            id="signature-canvas"
-            style="border: 1px dashed black; margin: auto"
-          />
+        <div
+          class="signature-canvas-wrapper"
+          style="padding: 1px; width: 340px; height: 182px;"
+        >
+          <canvas id="signature-canvas" width="320" height="180" style="border: 1px dashed black"/>
+        </div>
+        <div style="padding-top: 10px;">
+          <a class="link-button" href="#" @click.prevent="clear()"
+            >Clear Signature</a
+          >
+        <button class="button" @click="submit()" style="margin: 5px; margin-left: 15px;">OK</button>
         </div>
       </div>
-      <div class="dialog-footer">
-        <button @click="clear()" style="margin-right: 30px; margin-top: 10px;">Cancel</button>
-        <button @click="submit()" style="margin: auto;">OK</button>
-      </div>
+      <!-- <div
+        class="dialog-footer"
+        style="display: flex; justify-content: space-between"
+      >
+        <button class="button" @click="cancel()" style="margin: 5px">
+          Cancel
+        </button>
+      </div> -->
     </div>
   </div>
 </template>
@@ -35,30 +44,12 @@ export default Vue.extend({
   props: {
     value: {
       type: Boolean
-    },
-    width: {
-      type: String,
-      default: '90%'
-    },
-    height: {
-      type: String,
-      default: '400px'
     }
   },
 
   data () {
     return {
-      canvas: null as fabric.Canvas | null,
-      fullscreen: false
-    }
-  },
-
-  computed: {
-    cWidth (): string {
-      return this.fullscreen ? '100%' : this.width
-    },
-    cHeight (): string {
-      return this.fullscreen ? '100%' : this.height
+      canvas: null as fabric.Canvas | null
     }
   },
 
@@ -70,20 +61,6 @@ export default Vue.extend({
     }
   },
 
-  mounted () {
-    this.fullscreen = isMobile() && isLandscape()
-    window.addEventListener('orientationchange', () => {
-      this.fullscreen = isMobile() && isLandscape()
-
-      setTimeout(() => {
-        this.resizeCanvas()
-      }, 500)
-    }, false)
-    window.addEventListener('resize', () => {
-      this.resizeCanvas()
-    })
-  },
-
   methods: {
     async setupSignatureCanvas () {
       this.canvas = new fabric.Canvas('signature-canvas', {
@@ -91,7 +68,6 @@ export default Vue.extend({
       })
       this.canvas.freeDrawingBrush.width = 3
 
-      await this.$nextTick()
       this.resizeCanvas()
     },
 
@@ -101,9 +77,11 @@ export default Vue.extend({
       const wrapper = this.canvas.getElement().parentElement?.parentElement
       if (!wrapper) return
 
-      const width = min([wrapper.clientWidth - 50, window.screen.width - 100])
-      this.canvas.setHeight(wrapper.clientHeight - 100)
-      this.canvas.setWidth(width || 0)
+      setTimeout(() => {
+        if (!this.canvas) return
+        this.canvas.setHeight(180)
+        this.canvas.setWidth(320)
+      }, 500)
     },
 
     clear () {
@@ -114,6 +92,10 @@ export default Vue.extend({
         this.canvas.remove(obj)
       }
 
+      this.canvas.requestRenderAll()
+    },
+    cancel () {
+      this.clear()
       this.$emit('input', false)
     },
     submit () {
@@ -146,17 +128,16 @@ export default Vue.extend({
   overflow: auto; /* Enable scroll if needed */
   background-color: rgb(0, 0, 0); /* Fallback color */
   background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-  padding-top: 120px;
+  justify-content: space-between;
+  flex-direction: column;
 }
 
 .dialog-body {
   margin: auto;
-  position: relative;
 }
 
 .dialog-header {
-  position: absolute;
-  height: 60px;
+  height: 45px;
   top: 0;
   width: 100%;
   background-color: #eeeeee;
@@ -164,19 +145,21 @@ export default Vue.extend({
   z-index: 2;
 }
 
+.dialog-header > h3 {
+  padding-top: 10px;
+}
+
 .dialog-content {
-  padding-top: 60px;
-  padding-bottom: 60px;
   background-color: #fefefe;
   margin: auto;
-  height: calc(100% - 120px);
   max-width: 100%;
   overflow: hidden;
+  padding-top: 15px;
+  padding-bottom: 15px;
 }
 
 .dialog-footer {
-  height: 60px;
-  position: absolute;
+  height: 45px;
   bottom: 0;
   width: 100%;
   border-top: 1px solid black;
@@ -187,8 +170,6 @@ export default Vue.extend({
 .signature-canvas-wrapper {
   display: flex;
   justify-content: center;
-  padding-top: 25px;
-  padding-bottom: 25px;
   width: 100%;
   height: 100%;
 }
@@ -198,9 +179,12 @@ export default Vue.extend({
   margin-bottom: 0;
 }
 
-button {
+button.button {
   padding: 10px;
   min-width: 100px;
 }
 
+a.link-button {
+  text-decoration: none;
+}
 </style>

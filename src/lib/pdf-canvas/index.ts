@@ -1,15 +1,19 @@
 import { isMobile } from '@/utils/device'
 import { fabric } from 'fabric'
+import { DesktopCanvasController } from './desktop'
 import { MobileCanvasController } from './mobile'
 
 export interface PDFCanvasController {
   canvas: fabric.Canvas
+  totalPages: number
+  currentPage: number
 
   setup (canvasId: string, pdfUrl: string): void
   zoomIn (): void
   zoomOut (): void
   addSignature (signature: fabric.Group): void
   resizeCanvas (): void
+  goToPage (pageNum: number): void
 }
 
 export function setupCanvas (canvasId: string, pdfUrl: string): PDFCanvasController {
@@ -19,7 +23,7 @@ export function setupCanvas (canvasId: string, pdfUrl: string): PDFCanvasControl
     controller.setup(pdfUrl)
     return controller
   } else {
-    const controller = new MobileCanvasController(canvasId)
+    const controller = new DesktopCanvasController(canvasId)
     controller.setup(pdfUrl)
     return controller
   }

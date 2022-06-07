@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <pdf-signer pdfUrl="/example.pdf" />
+    <pdf-signer style="border: 1px solid #d0d0d0;" height="500" pdfUrl="/example.pdf" />
   </div>
 </template>
 

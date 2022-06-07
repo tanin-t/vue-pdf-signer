@@ -31,6 +31,9 @@ export class MobileCanvasController implements PDFCanvasController {
     zoomOut: 0.1
   }
 
+  currentPage = 1
+  totalPages = 1
+
   constructor (canvasId: string) {
     this.canvas = new fabric.Canvas(canvasId)
   }
@@ -41,6 +44,8 @@ export class MobileCanvasController implements PDFCanvasController {
     this.setupPanAndZoomBoundary(pages)
     this.setupPanAndZoomEventHandler()
 
+    this.totalPages = pages.length
+
     // Zoom out - fit width
     this.canvas.setZoom(this.boundary.zoomOut)
 
@@ -48,7 +53,7 @@ export class MobileCanvasController implements PDFCanvasController {
     for (const page of pages) {
       this.canvas.viewportCenterObjectH(page)
     }
-    this.canvas.viewportCenterObject(pages[0])
+    // this.canvas.viewportCenterObject(pages[0])
   }
 
   setupPanAndZoomEventHandler () {
@@ -151,6 +156,7 @@ export class MobileCanvasController implements PDFCanvasController {
       }
     }
     this.canvas.requestRenderAll()
+    this.updateCurrentPage()
     this.dragging.lastPosX = x
     this.dragging.lastPosY = y
   }
@@ -180,8 +186,10 @@ export class MobileCanvasController implements PDFCanvasController {
     if (!wrapper) {
       throw new Error("Can't find canvas wrapper")
     }
-    this.canvas.setWidth(wrapper.offsetWidth)
-    this.canvas.setHeight(wrapper.offsetWidth * Math.SQRT2)
+    const width = Number(wrapper.getAttribute('data-width')) || wrapper.offsetWidth
+    this.canvas.setWidth(width - 2)
+
+    this.canvas.setHeight(wrapper.getAttribute('data-height') || wrapper.offsetWidth * Math.SQRT2)
     this.canvas.setBackgroundColor('#eeeeee', console.log)
   }
 
@@ -243,5 +251,31 @@ export class MobileCanvasController implements PDFCanvasController {
     const pages = this.canvas.getObjects().filter((x) => _.get(x, 'attrs.type') === 'pdf-page')
     this.setupPanAndZoomBoundary(pages)
     this.canvas.setZoom(this.boundary.zoomOut)
+  }
+
+  goToPage (pageNum: number) {
+    const page = this.canvas.getObjects().find(x => _.get(x, 'attrs.type') === 'pdf-page')
+    const vpt = this.canvas.viewportTransform
+
+    if (page && vpt) {
+      const zoom = this.canvas.getZoom()
+      vpt[5] = (pageNum - 1) * page.getScaledHeight() * 1.05 * (-1) * zoom
+      this.canvas.requestRenderAll()
+      this.currentPage = pageNum
+    }
+  }
+
+  updateCurrentPage () {
+    const page = this.canvas.getObjects().find(x => _.get(x, 'attrs.type') === 'pdf-page')
+    const vpt = this.canvas.viewportTransform
+    const zoom = this.canvas.getZoom()
+
+    if (page && vpt) {
+      const pageHeight = page.getScaledHeight() * 1.05 * (-1) * zoom
+      const pageNum = Math.floor(vpt[5] / pageHeight) + 1
+      console.log(pageNum)
+
+      this.currentPage = pageNum
+    }
   }
 }
