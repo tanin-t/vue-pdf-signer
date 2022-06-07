@@ -72,17 +72,13 @@ export class PDFController {
   static async mergeAnnotations (pdfDoc: PDFDocument, canvas: fabric.Canvas): Promise<PDFDocument> {
     const pageSignaturesGroup = this.getSignaturesGroupByPage(canvas)
 
-    console.log({ pageSignaturesGroup })
-
     for (let i = 0; i < pdfDoc.getPageCount(); i++) {
-      console.log(i)
       const pdfPage = pdfDoc.getPage(i)
       const fabricPage = pageSignaturesGroup[i].page
       const pageSignatures = pageSignaturesGroup[i].signatures
 
       const tr = new PDFDimensionTransformer(fabricPage as fabric.Image, pdfPage)
       for (const sig of pageSignatures) {
-        console.log('sig', sig)
         const pdfImage = await this.getPDFImage(pdfDoc, sig.toDataURL({}))
         const coords = tr.getPDFCoords(sig)
         pdfPage.drawImage(
@@ -104,8 +100,6 @@ export class PDFController {
     const objs = canvas.getObjects() as FabricObject[]
     const pages = objs.filter(x => _.get(x, 'attrs.type') === 'pdf-page')
     const signatures = objs.filter(x => _.get(x, 'attrs.type') === 'signature')
-
-    console.log({ pages, signatures })
 
     const results = []
     for (const page of pages) {

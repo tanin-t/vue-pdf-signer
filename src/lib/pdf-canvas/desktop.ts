@@ -77,26 +77,10 @@ export class DesktopCanvasController extends MobileCanvasController {
   scrollPan (deltaX: number, deltaY: number) {
     const vpt = this.canvas.viewportTransform
     if (vpt) {
-      const zoom = this.canvas.getZoom()
       vpt[4] = vpt[4] - deltaX
       vpt[5] = vpt[5] - deltaY
-      const tl = { x: -vpt[4] / zoom, y: -vpt[5] / zoom }
-      const br = { x: (this.canvas.getWidth() - vpt[4]) / zoom, y: (this.canvas.getHeight() - vpt[5]) / zoom }
-
-      if (tl.x < this.boundary.left) {
-        vpt[4] = -this.boundary.left * zoom
-      }
-      if (br.x > this.boundary.right) {
-        vpt[4] = this.canvas.getWidth() - (this.boundary.right * zoom)
-      }
-
-      if (tl.y < this.boundary.top) {
-        vpt[5] = -this.boundary.top * zoom
-      }
-      if (br.y > this.boundary.bottom) {
-        vpt[5] = this.canvas.getHeight() - (this.boundary.bottom * zoom)
-      }
     }
+    this.moveViewportIntoBoundary()
     this.updateCurrentPage()
     this.canvas.requestRenderAll()
   }

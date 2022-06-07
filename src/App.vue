@@ -1,19 +1,28 @@
 <template>
   <div id="app">
-    <pdf-signer style="border: 1px solid #d0d0d0" pdfUrl="/example.pdf" />
+    <pdf-signer ref="pdf" style="border: 1px solid #d0d0d0" pdfUrl="/example.pdf" />
+
+    <div>External Control</div>
+    <button @click="exportPDF()">Export</button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import PdfSigner from './components/pdf-signer.vue'
+import { PDFCanvasController } from './lib/pdf-canvas'
 
 export default Vue.extend({
   name: 'App',
   components: {
     PdfSigner
   },
-  computed: {
+  methods: {
+    async exportPDF () {
+      const controller = (this.$refs.pdf as any).controller as PDFCanvasController
+      const pdfBytes = await controller.exportPDF()
+      console.log(pdfBytes)
+    }
   }
 })
 </script>

@@ -14,6 +14,7 @@ export interface PDFCanvasController {
   addSignature (signature: fabric.Group): void
   resizeCanvas (): void
   goToPage (pageNum: number): void
+  exportPDF (): Promise<Uint8Array>
 }
 
 export function setupCanvas (canvasId: string, pdfUrl: string): PDFCanvasController {

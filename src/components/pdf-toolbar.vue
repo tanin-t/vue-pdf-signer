@@ -17,12 +17,12 @@
 
       <span style="font-size: 32px">&nbsp;</span>
 
-      <!-- <button v-if="!isMobile" @click="$emit('click-zoomout')" class="icon-button">
+      <button v-if="!isMobile" @click="$emit('click-zoomout')" class="icon-button">
         <svg-icon type="mdi" :path="icons.zoomOut" />
       </button>
       <button v-if="!isMobile" @click="$emit('click-zoomin')" class="icon-button">
         <svg-icon type="mdi" :path="icons.zoomIn" />
-      </button> -->
+      </button>
     </div>
 
     <div>

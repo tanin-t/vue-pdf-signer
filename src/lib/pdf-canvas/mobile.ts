@@ -3,6 +3,7 @@ import { fabric } from 'fabric'
 import { PDFCanvasController } from '.'
 import { renderPDF } from './common'
 import _ from 'lodash'
+import { PDFController } from '../pdf-renderer'
 
 interface TouchPoint {
   x: number
@@ -10,6 +11,7 @@ interface TouchPoint {
 }
 export class MobileCanvasController implements PDFCanvasController {
   canvas: fabric.Canvas
+  pdfUrl?: string
 
   dragging = {
     isDragging: false,
@@ -60,10 +62,6 @@ export class MobileCanvasController implements PDFCanvasController {
     if (!this.canvas) {
       throw new Error('`this.canvas` is not initialized')
     }
-
-    this.canvas.on('touch:drag', (e) => {
-      console.log('touch:drag', e)
-    })
 
     this.canvas.on('mouse:move:before', (opt) => {
       // console.log('mouse:move:before', e)
@@ -135,26 +133,11 @@ export class MobileCanvasController implements PDFCanvasController {
     const { x, y } = p
     const vpt = this.canvas.viewportTransform
     if (vpt) {
-      const zoom = this.canvas.getZoom()
       vpt[4] = vpt[4] + (x - this.dragging.lastPosX)
       vpt[5] = vpt[5] + (y - this.dragging.lastPosY)
-      const tl = { x: -vpt[4] / zoom, y: -vpt[5] / zoom }
-      const br = { x: (this.canvas.getWidth() - vpt[4]) / zoom, y: (this.canvas.getHeight() - vpt[5]) / zoom }
-
-      if (tl.x < this.boundary.left) {
-        vpt[4] = -this.boundary.left * zoom
-      }
-      if (br.x > this.boundary.right) {
-        vpt[4] = this.canvas.getWidth() - (this.boundary.right * zoom)
-      }
-
-      if (tl.y < this.boundary.top) {
-        vpt[5] = -this.boundary.top * zoom
-      }
-      if (br.y > this.boundary.bottom) {
-        vpt[5] = this.canvas.getHeight() - (this.boundary.bottom * zoom)
-      }
     }
+
+    this.moveViewportIntoBoundary()
     this.canvas.requestRenderAll()
     this.updateCurrentPage()
     this.dragging.lastPosX = x
@@ -190,7 +173,7 @@ export class MobileCanvasController implements PDFCanvasController {
     this.canvas.setWidth(width - 2)
 
     this.canvas.setHeight(wrapper.getAttribute('data-height') || wrapper.offsetWidth * Math.SQRT2)
-    this.canvas.setBackgroundColor('#eeeeee', console.log)
+    this.canvas.setBackgroundColor('#eeeeee', () => { /**/ })
   }
 
   setupPanAndZoomBoundary (pages: fabric.Object[]) {
@@ -202,6 +185,7 @@ export class MobileCanvasController implements PDFCanvasController {
   }
 
   async drawPDFPages (pdfUrl: string) {
+    this.pdfUrl = pdfUrl
     const pages = await renderPDF(pdfUrl)
     for (const page of pages) {
       (page as never as FabricObject).attrs = { type: 'pdf-page' }
@@ -233,6 +217,31 @@ export class MobileCanvasController implements PDFCanvasController {
       zoom = this.boundary.zoomOut
     }
     this.canvas.setZoom(zoom)
+
+    this.moveViewportIntoBoundary()
+  }
+
+  moveViewportIntoBoundary () {
+    const vpt = this.canvas.viewportTransform
+    if (vpt) {
+      const zoom = this.canvas.getZoom()
+      const tl = { x: -vpt[4] / zoom, y: -vpt[5] / zoom }
+      const br = { x: (this.canvas.getWidth() - vpt[4]) / zoom, y: (this.canvas.getHeight() - vpt[5]) / zoom }
+
+      if (tl.x < this.boundary.left) {
+        vpt[4] = -this.boundary.left * zoom
+      }
+      if (br.x > this.boundary.right) {
+        vpt[4] = this.canvas.getWidth() - (this.boundary.right * zoom)
+      }
+
+      if (tl.y < this.boundary.top) {
+        vpt[5] = -this.boundary.top * zoom
+      }
+      if (br.y > this.boundary.bottom) {
+        vpt[5] = this.canvas.getHeight() - (this.boundary.bottom * zoom)
+      }
+    }
   }
 
   addSignature (signature: fabric.Group) {
@@ -275,5 +284,15 @@ export class MobileCanvasController implements PDFCanvasController {
       const pageNum = Math.floor(vpt[5] / pageHeight) + 1
       this.currentPage = pageNum
     }
+  }
+
+  async exportPDF (): Promise<Uint8Array> {
+    if (!this.pdfUrl) {
+      throw new Error('Missing this.pdfUrl')
+    }
+    const pdfDoc = await PDFController.getPDFDocument(this.pdfUrl)
+    await PDFController.mergeAnnotations(pdfDoc, this.canvas)
+    const pdfBytes = await pdfDoc.save()
+    return pdfBytes
   }
 }

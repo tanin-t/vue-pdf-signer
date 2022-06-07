@@ -43,8 +43,6 @@
 <script lang="ts">
 import Vue from 'vue'
 import { fabric } from 'fabric'
-import { min } from 'lodash'
-import { isLandscape, isMobile } from '@/utils/device'
 
 export default Vue.extend({
   props: {

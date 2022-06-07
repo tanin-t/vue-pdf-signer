@@ -28,8 +28,7 @@
 import Vue from 'vue'
 import { fabric } from 'fabric'
 import SignatureDialog from './signature-dialog.vue'
-import { PDFCanvasController, drawRulers, setupCanvas } from '@/lib/pdf-canvas'
-import { PDFController } from '@/lib/pdf-renderer'
+import { PDFCanvasController, setupCanvas } from '@/lib/pdf-canvas'
 import { debounce } from 'lodash'
 import PdfToolbar from './pdf-toolbar.vue'
 
@@ -75,16 +74,9 @@ export default Vue.extend({
         this.resizeHandler(e)
       }
     }
-
-    // setTimeout(() => {
-    //   if (this.controller && this.controller.canvas) {
-    //     drawRulers(this.controller.canvas)
-    //   }
-    // }, 1000)
   },
   methods: {
     insertSignature (signature: fabric.Group) {
-      console.log('insertSignature', signature)
       if (!signature) return
       if (!this.controller) return
       this.controller.addSignature(signature)
@@ -100,20 +92,14 @@ export default Vue.extend({
         throw new Error('`this.controller` is not initialized')
       }
 
-      const pdfDoc = await PDFController.getPDFDocument(this.pdfUrl)
-      await PDFController.mergeAnnotations(pdfDoc, this.controller.canvas)
-
-      const pdfBytes = await pdfDoc.save()
+      const pdfBytes = await this.controller.exportPDF()
       const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' })
-      console.log(pdfBlob)
 
       const url = window.URL.createObjectURL(pdfBlob)
       window.open(url, '_blank')
-      console.log(url)
     },
 
     changePage (pageNum: string) {
-      console.log(pageNum)
       if (!this.controller) {
         return
       }
