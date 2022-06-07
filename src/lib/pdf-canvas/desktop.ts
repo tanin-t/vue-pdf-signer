@@ -97,6 +97,7 @@ export class DesktopCanvasController extends MobileCanvasController {
         vpt[5] = this.canvas.getHeight() - (this.boundary.bottom * zoom)
       }
     }
+    this.updateCurrentPage()
     this.canvas.requestRenderAll()
   }
 }

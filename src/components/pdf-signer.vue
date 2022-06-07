@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="overflow-y: scroll">
     <!-- <button @click="dialog = true">Sign</button>
     <button @click="exportPDF()">Export</button>
     <button @click="zoomIn()">Zoom In</button>

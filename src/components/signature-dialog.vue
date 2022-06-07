@@ -4,32 +4,38 @@
     :style="{ display: value ? 'flex' : 'none' }"
     @click.self="$emit('input', false)"
   >
-    <div class="dialog-body" style="max-width: 440px; max-height: 360px; overflow-y: scroll">
+    <div
+      class="dialog-body"
+      style="max-height: 360px; overflow-y: scroll"
+    >
       <div class="dialog-header" @click="$emit('input', false)">
         <h3>Signature</h3>
       </div>
       <div class="dialog-content">
         <div
           class="signature-canvas-wrapper"
-          style="padding: 1px; width: 340px; height: 182px;"
+          style="padding: 1px; width: 500px; height: 180px"
         >
-          <canvas id="signature-canvas" width="320" height="180" style="border: 1px dashed black"/>
+          <canvas
+            id="signature-canvas"
+            width="480"
+            height="180"
+            style="border: 1px dashed black"
+          />
         </div>
-        <div style="padding-top: 10px;">
-          <a class="link-button" href="#" @click.prevent="clear()"
-            >Clear Signature</a
+        <div style="padding-top: 10px">
+          <a class="link-button" href="#" @click.prevent="clear()">
+            Clear Signature
+          </a>
+          <button
+            class="button"
+            @click="submit()"
+            style="margin: 5px; margin-left: 15px"
           >
-        <button class="button" @click="submit()" style="margin: 5px; margin-left: 15px;">OK</button>
+            OK
+          </button>
         </div>
       </div>
-      <!-- <div
-        class="dialog-footer"
-        style="display: flex; justify-content: space-between"
-      >
-        <button class="button" @click="cancel()" style="margin: 5px">
-          Cancel
-        </button>
-      </div> -->
     </div>
   </div>
 </template>
@@ -67,21 +73,6 @@ export default Vue.extend({
         isDrawingMode: true
       })
       this.canvas.freeDrawingBrush.width = 3
-
-      this.resizeCanvas()
-    },
-
-    resizeCanvas () {
-      if (!this.canvas) return
-
-      const wrapper = this.canvas.getElement().parentElement?.parentElement
-      if (!wrapper) return
-
-      setTimeout(() => {
-        if (!this.canvas) return
-        this.canvas.setHeight(180)
-        this.canvas.setWidth(320)
-      }, 500)
     },
 
     clear () {

@@ -1,11 +1,9 @@
 <template>
   <div class="toolbar">
-    <div style="margin-top: auto; margin-bottom: auto;">
-      <span style="widht: 2px;">&nbsp;</span>
-
-      <div style="display: inline-block; width: 120px;">
+    <div>
+      <div style="display: inline-block; width: 110px;">
         <!-- <svg-icon type="mdi" :path="icons.pages" /> -->
-        <span style="font-size: 16px; position: relative; margin-left: 5px; height: 40px;">
+        <span style="font-size: 16px; height: 40px; position: relative; top: -5px;">
           Page
           <input
             class="page-input"
@@ -17,12 +15,14 @@
         </span>
       </div>
 
-      <button v-if="!isMobile" @click="$emit('click-zoomout')" class="icon-button">
+      <span style="font-size: 32px">&nbsp;</span>
+
+      <!-- <button v-if="!isMobile" @click="$emit('click-zoomout')" class="icon-button">
         <svg-icon type="mdi" :path="icons.zoomOut" />
       </button>
       <button v-if="!isMobile" @click="$emit('click-zoomin')" class="icon-button">
         <svg-icon type="mdi" :path="icons.zoomIn" />
-      </button>
+      </button> -->
     </div>
 
     <div>
@@ -131,7 +131,17 @@ export default Vue.extend({
   border: none;
   text-align: center;
   font-size: 16px;
-  border-radius: 5px;
-  background: #eeeeee
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
 </style>

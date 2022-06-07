@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <pdf-signer style="border: 1px solid #d0d0d0;" height="500" pdfUrl="/example.pdf" />
+    <pdf-signer style="border: 1px solid #d0d0d0" pdfUrl="/example.pdf" />
   </div>
 </template>
 
@@ -12,6 +12,8 @@ export default Vue.extend({
   name: 'App',
   components: {
     PdfSigner
+  },
+  computed: {
   }
 })
 </script>

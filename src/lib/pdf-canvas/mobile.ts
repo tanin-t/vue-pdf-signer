@@ -273,8 +273,6 @@ export class MobileCanvasController implements PDFCanvasController {
     if (page && vpt) {
       const pageHeight = page.getScaledHeight() * 1.05 * (-1) * zoom
       const pageNum = Math.floor(vpt[5] / pageHeight) + 1
-      console.log(pageNum)
-
       this.currentPage = pageNum
     }
   }
