@@ -137,11 +137,19 @@ export class MobileCanvasController implements PDFCanvasController {
       vpt[5] = vpt[5] + (y - this.dragging.lastPosY)
     }
 
-    this.moveViewportIntoBoundary()
+    const reach = this.moveViewportIntoBoundary()
     this.canvas.requestRenderAll()
     this.updateCurrentPage()
     this.dragging.lastPosX = x
     this.dragging.lastPosY = y
+
+    if (reach.bottom) {
+      window.scrollBy(0, 10)
+    }
+
+    if (reach.top) {
+      window.scrollBy(0, -10)
+    }
   }
 
   pinchZoom (p1: TouchPoint, p2: TouchPoint) {
@@ -232,6 +240,12 @@ export class MobileCanvasController implements PDFCanvasController {
 
   moveViewportIntoBoundary () {
     const vpt = this.canvas.viewportTransform
+    const reach = {
+      top: false,
+      left: false,
+      right: false,
+      bottom: false
+    }
     if (vpt) {
       const zoom = this.canvas.getZoom()
       const tl = { x: -vpt[4] / zoom, y: -vpt[5] / zoom }
@@ -246,11 +260,15 @@ export class MobileCanvasController implements PDFCanvasController {
 
       if (tl.y < this.boundary.top) {
         vpt[5] = -this.boundary.top * zoom
+        reach.top = true
       }
       if (br.y > this.boundary.bottom) {
         vpt[5] = this.canvas.getHeight() - (this.boundary.bottom * zoom)
+        reach.bottom = true
       }
     }
+
+    return reach
   }
 
   // getViewportTLBR () {

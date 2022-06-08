@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <pdf-signer ref="pdf" style="border: 1px solid #d0d0d0" pdfUrl="/example2.pdf" :height="800" />
+    <pdf-signer ref="pdf" style="border: 1px solid #d0d0d0" pdfUrl="/example.pdf" />
 
     <div>External Control</div>
     <button @click="exportPDF()">Export</button>

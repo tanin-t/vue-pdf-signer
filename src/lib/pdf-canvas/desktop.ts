@@ -70,7 +70,12 @@ export class DesktopCanvasController extends MobileCanvasController {
 
     this.canvas.on('mouse:wheel', (opt) => {
       // console.log('mouse:wheel', opt)
-      this.scrollPan(opt.e.deltaX, opt.e.deltaY)
+      const hit = this.scrollPan(opt.e.deltaX, opt.e.deltaY)
+
+      if (!hit.bottom && !hit.top) {
+        opt.e.preventDefault()
+        opt.e.stopPropagation()
+      }
     })
   }
 
@@ -80,8 +85,10 @@ export class DesktopCanvasController extends MobileCanvasController {
       vpt[4] = vpt[4] - deltaX
       vpt[5] = vpt[5] - deltaY
     }
-    this.moveViewportIntoBoundary()
+    const hit = this.moveViewportIntoBoundary()
     this.updateCurrentPage()
     this.canvas.requestRenderAll()
+
+    return hit
   }
 }
