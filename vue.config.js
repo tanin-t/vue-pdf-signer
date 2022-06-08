@@ -5,5 +5,10 @@ module.exports = defineConfig({
     allowedHosts: 'all',
     hot: false,
     liveReload: false
+  },
+  configureWebpack: {
+    output: {
+      libraryExport: 'default'
+    }
   }
 })

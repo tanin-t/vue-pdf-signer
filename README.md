@@ -1,4 +1,4 @@
-# jera-pdf-kit
+# vue-pdf-signer
 
 ## Project setup
 ```

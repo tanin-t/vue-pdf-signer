@@ -6,7 +6,7 @@
   >
     <div
       class="dialog-body"
-      style="max-height: 360px; overflow-y: scroll"
+      style="max-height: 360px; overflow-y: auto;"
     >
       <div class="dialog-header" @click="$emit('input', false)">
         <h3>Signature</h3>
@@ -23,7 +23,7 @@
             style="border: 1px dashed black"
           />
         </div>
-        <div style="padding-top: 10px">
+        <div style="display: flex; padding-top: 10px; justify-content: center;">
           <a class="link-button" href="#" @click.prevent="clear()">
             Clear Signature
           </a>
@@ -132,6 +132,7 @@ export default Vue.extend({
   background-color: #eeeeee;
   border-bottom: 1px solid black;
   z-index: 2;
+  text-align: center;
 }
 
 .dialog-header > h3 {
@@ -175,5 +176,7 @@ button.button {
 
 a.link-button {
   text-decoration: none;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 </style>

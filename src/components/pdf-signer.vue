@@ -1,5 +1,5 @@
 <template>
-  <div style="overflow-y: scroll">
+  <div>
     <!-- <button @click="dialog = true">Sign</button>
     <button @click="exportPDF()">Export</button>
     <button @click="zoomIn()">Zoom In</button>
@@ -37,6 +37,7 @@ interface ResizeHandler {
 }
 
 export default Vue.extend({
+  name: 'PdfSigner',
   components: { SignatureDialog, PdfToolbar },
   props: {
     pdfUrl: {

@@ -2,7 +2,7 @@ import { FabricObject } from '@/types/fabric'
 import { fabric } from 'fabric'
 import { PDFCanvasController } from '.'
 import { renderPDF } from './common'
-import _ from 'lodash'
+import _, { wrap } from 'lodash'
 import { PDFController } from '../pdf-renderer'
 
 interface TouchPoint {
@@ -41,8 +41,8 @@ export class MobileCanvasController implements PDFCanvasController {
   }
 
   async setup (pdfUrl: string) {
-    this.setupCanvasDimensions()
     const pages = await this.drawPDFPages(pdfUrl)
+    this.setupCanvasDimensions(pages)
     this.setupPanAndZoomBoundary(pages)
     this.setupPanAndZoomEventHandler()
 
@@ -164,7 +164,7 @@ export class MobileCanvasController implements PDFCanvasController {
     this.pinching.lastDistance = distance
   }
 
-  setupCanvasDimensions () {
+  setupCanvasDimensions (pages?: fabric.Object[]) {
     const wrapper = this.canvas.getElement().parentElement?.parentElement
     if (!wrapper) {
       throw new Error("Can't find canvas wrapper")
@@ -172,7 +172,16 @@ export class MobileCanvasController implements PDFCanvasController {
     const width = Number(wrapper.getAttribute('data-width')) || wrapper.offsetWidth
     this.canvas.setWidth(width - 2)
 
-    this.canvas.setHeight(wrapper.getAttribute('data-height') || wrapper.offsetWidth * Math.SQRT2)
+    const userHeight = wrapper.getAttribute('data-height')
+    if (userHeight) {
+      this.canvas.setHeight(userHeight)
+    } else if (pages) {
+      const page = pages[0]
+      const ratio = page.getScaledHeight() / page.getScaledWidth()
+      this.canvas.setHeight(wrapper.offsetWidth * ratio)
+    } else {
+      this.canvas.setHeight(wrapper.offsetWidth * Math.SQRT2)
+    }
     this.canvas.setBackgroundColor('#eeeeee', () => { /**/ })
   }
 
@@ -244,6 +253,18 @@ export class MobileCanvasController implements PDFCanvasController {
     }
   }
 
+  // getViewportTLBR () {
+  //   const vpt = this.canvas.viewportTransform
+  //   if (!vpt) {
+  //     throw new Error('no viewport')
+  //   }
+
+  //   const zoom = this.canvas.getZoom()
+  //   const tl = { x: -vpt[4] / zoom, y: -vpt[5] / zoom }
+  //   const br = { x: (this.canvas.getWidth() - vpt[4]) / zoom, y: (this.canvas.getHeight() - vpt[5]) / zoom }
+  //   return { tl, br }
+  // }
+
   addSignature (signature: fabric.Group) {
     if (!this.canvas) {
       throw new Error('`this.canvas` is not initialized')
@@ -256,8 +277,8 @@ export class MobileCanvasController implements PDFCanvasController {
   }
 
   resizeCanvas () {
-    this.setupCanvasDimensions()
     const pages = this.canvas.getObjects().filter((x) => _.get(x, 'attrs.type') === 'pdf-page')
+    this.setupCanvasDimensions(pages)
     this.setupPanAndZoomBoundary(pages)
     this.canvas.setZoom(this.boundary.zoomOut)
   }

@@ -1,9 +1,9 @@
 <template>
   <div class="toolbar">
     <div>
-      <div style="display: inline-block; width: 110px;">
+      <div style="display: inline-block; width: 110px; text-align: center;">
         <!-- <svg-icon type="mdi" :path="icons.pages" /> -->
-        <span style="font-size: 16px; height: 40px; position: relative; top: -5px;">
+        <span style="font-size: 16px; height: 40px; position: relative; top: -5px; margin-left: 5px;">
           Page
           <input
             class="page-input"
@@ -15,7 +15,7 @@
         </span>
       </div>
 
-      <span style="font-size: 32px">&nbsp;</span>
+      <span style="font-size: 32px; width: 0;">&nbsp;</span>
 
       <button v-if="!isMobile" @click="$emit('click-zoomout')" class="icon-button">
         <svg-icon type="mdi" :path="icons.zoomOut" />
@@ -26,6 +26,7 @@
     </div>
 
     <div>
+      <span style="font-size: 32px; width: 0;">&nbsp;</span>
       <button
         @click="$emit('click-sign')"
         class="icon-button"
@@ -36,10 +37,9 @@
           Add Signature
         </span>
       </button>
-      <button @click="$emit('click-export')" class="icon-button">
+      <button @click="$emit('click-export')" class="icon-button" style="margin-right: 5px;">
         <svg-icon type="mdi" :path="icons.export" />
       </button>
-      <span style="widht: 2px;">&nbsp;</span>
     </div>
   </div>
 </template>
@@ -131,6 +131,7 @@ export default Vue.extend({
   border: none;
   text-align: center;
   font-size: 16px;
+  background-color: white;
 }
 
 /* Chrome, Safari, Edge, Opera */
