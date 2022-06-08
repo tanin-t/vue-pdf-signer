@@ -144,11 +144,11 @@ export class MobileCanvasController implements PDFCanvasController {
     this.dragging.lastPosY = y
 
     if (reach.bottom) {
-      window.scrollBy(0, 10)
+      window.scrollBy(0, 20)
     }
 
     if (reach.top) {
-      window.scrollBy(0, -10)
+      window.scrollBy(0, -20)
     }
   }
 
