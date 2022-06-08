@@ -1,7 +1,7 @@
 {
   "name": "vue-pdf-signer",
   "author": "tanin-t",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "main": "./dist/vue-pdf-signer.common.js",
   "scripts": {
