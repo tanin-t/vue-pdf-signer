@@ -97,7 +97,10 @@ export default Vue.extend({
       const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' })
 
       const url = window.URL.createObjectURL(pdfBlob)
-      window.open(url, '_blank')
+      const newtab = window.open(url, '_blank')
+      if (!newtab || newtab.closed) {
+        window.location.href = url
+      }
     },
 
     changePage (pageNum: string) {
