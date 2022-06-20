@@ -183,9 +183,8 @@ export class MobileCanvasController implements PDFCanvasController {
     const userHeight = wrapper.getAttribute('data-height')
     if (userHeight) {
       this.canvas.setHeight(userHeight)
-    } else if (pages) {
-      const page = pages[0]
-      const ratio = page.getScaledHeight() / page.getScaledWidth()
+    } else if (pages && pages[0]) {
+      const ratio = pages[0].getScaledHeight() / pages[0].getScaledWidth()
       this.canvas.setHeight(wrapper.offsetWidth * ratio)
     } else {
       this.canvas.setHeight(wrapper.offsetWidth * Math.SQRT2)
