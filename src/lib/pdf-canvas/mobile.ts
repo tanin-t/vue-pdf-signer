@@ -45,6 +45,7 @@ export class MobileCanvasController implements PDFCanvasController {
     this.setupCanvasDimensions(pages)
     this.setupPanAndZoomBoundary(pages)
     this.setupPanAndZoomEventHandler()
+    this.setupDrawingEventHandler()
 
     this.totalPages = pages.length
 
@@ -211,6 +212,17 @@ export class MobileCanvasController implements PDFCanvasController {
     return pages
   }
 
+  setupDrawingEventHandler () {
+    if (!this.canvas) {
+      throw new Error('`this.canvas` is not initialized')
+    }
+
+    this.canvas.on('path:created', (evt: any) => {
+      const p = evt.path as never as FabricObject
+      p.attrs = { type: 'signature' }
+    })
+  }
+
   zoomIn () {
     if (!this.canvas) {
       throw new Error('`this.canvas` is not initialized')
@@ -293,6 +305,17 @@ export class MobileCanvasController implements PDFCanvasController {
     this.canvas.viewportCenterObject(sig)
   }
 
+  addDrawing (drawing: fabric.Group): void {
+    if (!this.canvas) {
+      throw new Error('`this.canvas` is not initialized')
+    }
+
+    for (const line of drawing.getObjects()) {
+      (line as FabricObject).attrs = { type: 'signature' }
+      this.canvas.add(line)
+    }
+  }
+
   resizeCanvas () {
     const pages = this.canvas.getObjects().filter((x) => _.get(x, 'attrs.type') === 'pdf-page')
     this.setupCanvasDimensions(pages)
@@ -332,5 +355,9 @@ export class MobileCanvasController implements PDFCanvasController {
     await PDFController.mergeAnnotations(pdfDoc, this.canvas)
     const pdfBytes = await pdfDoc.save()
     return pdfBytes
+  }
+
+  setDrawingMode (enable: boolean): void {
+    this.canvas.isDrawingMode = enable
   }
 }

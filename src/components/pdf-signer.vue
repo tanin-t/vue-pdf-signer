@@ -13,7 +13,9 @@
         @click-zoomout="zoomOut()"
         @click-sign="dialog = true"
         @click-export="exportPDF()"
+        @click-draw="toggleDrawingMode()"
         @update:page="changePage($event)"
+        :is-drawing="isDrawing"
         :page="controller.currentPage"
         :total-pages="controller.totalPages"
       />
@@ -57,7 +59,8 @@ export default Vue.extend({
     return {
       dialog: false,
       controller: null as PDFCanvasController | null,
-      resizeHandler: null as ResizeHandler | null
+      resizeHandler: null as ResizeHandler | null,
+      isDrawing: false
     }
   },
   mounted () {
@@ -123,6 +126,24 @@ export default Vue.extend({
       }
 
       this.controller.goToPage(n)
+    },
+
+    toggleDrawingMode () {
+      if (!this.isDrawing) {
+        this.startDrawing()
+      } else {
+        this.stopDrawing()
+      }
+    },
+
+    startDrawing () {
+      this.isDrawing = true
+      this.controller?.setDrawingMode(true)
+    },
+
+    stopDrawing () {
+      this.isDrawing = false
+      this.controller?.setDrawingMode(false)
     }
   }
 })

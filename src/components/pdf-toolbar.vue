@@ -37,6 +37,17 @@
           Add Signature
         </span>
       </button>
+      <button
+        @click="$emit('click-draw')"
+        class="icon-button"
+        :class="{'active': isDrawing}"
+        style="width: 160px"
+      >
+        <svg-icon type="mdi" :path="icons.drawPen" />
+        <span style="font-size: 16px; position: relative; top: -5px">
+          Draw
+        </span>
+      </button>
       <button @click="$emit('click-export')" class="icon-button" style="margin-right: 5px;">
         <svg-icon type="mdi" :path="icons.export" />
       </button>
@@ -52,7 +63,8 @@ import {
   mdiMagnifyMinus,
   mdiMagnifyPlus,
   mdiSignatureFreehand,
-  mdiFormatListBulletedSquare
+  mdiFormatListBulletedSquare,
+  mdiDrawPen
 } from '@mdi/js'
 import { isMobile } from '@/utils/device'
 
@@ -69,6 +81,10 @@ export default Vue.extend({
     totalPages: {
       type: Number,
       required: true
+    },
+    isDrawing: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -85,7 +101,8 @@ export default Vue.extend({
         zoomOut: mdiMagnifyMinus,
         sign: mdiSignatureFreehand,
         export: mdiDownload,
-        pages: mdiFormatListBulletedSquare
+        pages: mdiFormatListBulletedSquare,
+        drawPen: mdiDrawPen
       }
     }
   }
@@ -113,6 +130,10 @@ export default Vue.extend({
 
 .icon-button:active {
   background: #cccccc;
+}
+
+.active {
+  background: #aaaaaa;
 }
 
 .toolbar {
