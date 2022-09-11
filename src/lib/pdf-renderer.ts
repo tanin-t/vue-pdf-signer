@@ -5,9 +5,10 @@ import _ from 'lodash'
 import { PDFDocument, PDFImage } from 'pdf-lib'
 import { PDFDocumentProxy, PDFPageProxy } from '..'
 
-interface PageSignatures {
+interface PageAnnotations {
   page: fabric.Object
   signatures: fabric.Object[]
+  images: fabric.Object[]
 }
 
 export class PDFController {
@@ -70,12 +71,13 @@ export class PDFController {
   }
 
   static async mergeAnnotations (pdfDoc: PDFDocument, canvas: fabric.Canvas): Promise<PDFDocument> {
-    const pageSignaturesGroup = this.getSignaturesGroupByPage(canvas)
+    const annotationGroup = this.getAnnotationsGroupByPage(canvas)
 
     for (let i = 0; i < pdfDoc.getPageCount(); i++) {
       const pdfPage = pdfDoc.getPage(i)
-      const fabricPage = pageSignaturesGroup[i].page
-      const pageSignatures = pageSignaturesGroup[i].signatures
+      const fabricPage = annotationGroup[i].page
+      const pageSignatures = annotationGroup[i].signatures
+      const pageImages = annotationGroup[i].images
 
       const tr = new PDFDimensionTransformer(fabricPage as fabric.Image, pdfPage)
       for (const sig of pageSignatures) {
@@ -91,21 +93,37 @@ export class PDFController {
           }
         )
       }
+
+      for (const img of pageImages) {
+        const pdfImage = await this.getPDFImage(pdfDoc, img.toDataURL({}))
+        const coords = tr.getPDFCoords(img)
+        pdfPage.drawImage(
+          pdfImage,
+          {
+            x: coords.x,
+            y: coords.y - tr.getPDFLength(pdfImage.height),
+            width: tr.getPDFLength(pdfImage.width),
+            height: tr.getPDFLength(pdfImage.height)
+          }
+        )
+      }
     }
 
     return pdfDoc
   }
 
-  static getSignaturesGroupByPage (canvas: fabric.Canvas): PageSignatures[] {
+  static getAnnotationsGroupByPage (canvas: fabric.Canvas): PageAnnotations[] {
     const objs = canvas.getObjects() as FabricObject[]
     const pages = objs.filter(x => _.get(x, 'attrs.type') === 'pdf-page')
     const signatures = objs.filter(x => _.get(x, 'attrs.type') === 'signature')
+    const images = objs.filter(x => _.get(x, 'attrs.type') === 'image')
 
     const results = []
     for (const page of pages) {
       results.push({
         page: page,
-        signatures: signatures.filter(s => s.isContainedWithinObject(page))
+        signatures: signatures.filter(s => s.isContainedWithinObject(page)),
+        images: images
       })
     }
 

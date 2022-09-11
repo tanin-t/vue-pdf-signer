@@ -220,6 +220,11 @@ export class MobileCanvasController implements PDFCanvasController {
     this.canvas.on('path:created', (evt: any) => {
       const p = evt.path as never as FabricObject
       p.attrs = { type: 'signature' }
+      p.lockMovementX = true
+      p.lockMovementY = true
+      p.lockRotation = true
+      p.lockScalingX = true
+      p.lockScalingY = true
     })
   }
 
@@ -359,5 +364,19 @@ export class MobileCanvasController implements PDFCanvasController {
 
   setDrawingMode (enable: boolean): void {
     this.canvas.isDrawingMode = enable
+  }
+
+  insertImage (file: File, opacity = 1, insertToAllPages = false): void {
+    fabric.Image.fromURL(URL.createObjectURL(file), (img) => {
+      img.set({
+        left: 100,
+        top: 100,
+        opacity: opacity
+      })
+      img.scaleToWidth(300);
+      (img as never as FabricObject).attrs = { type: 'image' }
+      this.canvas.viewportCenterObject(img)
+      this.canvas.add(img)
+    })
   }
 }
