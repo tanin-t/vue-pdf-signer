@@ -1,7 +1,7 @@
 <template>
   <x-dialog
     :value="value"
-    @input="$emit('input', $event)"
+    @input="close()"
     :max-height="'600px'"
   >
     <template #header>
@@ -25,11 +25,11 @@
         />
       </div>
 
-      <div style="margin-top: 20px">
+      <div style="display: none">
         <input
           type="file"
           id="file-input"
-          style="display: none"
+          :key="`file-input-${fileInputKey}`"
           accept="image/*"
           @change="onFileSelected($event)"
         />
@@ -37,7 +37,6 @@
           type="file"
           id="file-input-camera"
           capture="environment"
-          style="display: none"
           accept="image/*"
           @change="onFileSelected($event)"
         />
@@ -53,6 +52,7 @@
           width: 325px;
           height: 250px;
           padding: 5px;
+          margin: 15px 0;
         "
       >
         <img
@@ -77,12 +77,12 @@
               />
             </td>
           </tr>
-          <tr>
+          <!-- <tr>
             <td>Insert as watermark</td>
             <td style="position: relative; top: 2px">
               <input v-model="insertToAllPages" type="checkbox" />
             </td>
-          </tr>
+          </tr> -->
         </table>
       </div>
 
@@ -120,7 +120,9 @@ export default Vue.extend({
         upload: mdiUpload,
         camera: mdiCamera,
         plus: mdiPlus
-      }
+      },
+
+      fileInputKey: 1
     }
   },
 
@@ -156,9 +158,11 @@ export default Vue.extend({
       this.previewUrl = ''
       this.opacity = 1
       this.insertToAllPages = false
+      this.fileInputKey += 1
     },
 
     close () {
+      this.clear()
       this.$emit('input', false)
     },
 
@@ -173,7 +177,6 @@ export default Vue.extend({
         opacity: this.opacity,
         insertToAllPages: this.insertToAllPages
       })
-      this.clear()
       this.close()
     }
   }
