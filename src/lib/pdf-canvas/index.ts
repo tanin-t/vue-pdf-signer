@@ -12,9 +12,12 @@ export interface PDFCanvasController {
   zoomIn (): void
   zoomOut (): void
   addSignature (signature: fabric.Group): void
+  addDrawing (drawing: fabric.Group): void
   resizeCanvas (): void
   goToPage (pageNum: number): void
   exportPDF (): Promise<Uint8Array>
+  setDrawingMode (enable: boolean): void
+  insertImage (file: File, opacity?: number, insertToAllPages?: boolean): void
 }
 
 export function setupCanvas (canvasId: string, pdfUrl: string): PDFCanvasController {

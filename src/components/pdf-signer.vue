@@ -1,36 +1,37 @@
 <template>
   <div>
-    <!-- <button @click="dialog = true">Sign</button>
-    <button @click="exportPDF()">Export</button>
-    <button @click="zoomIn()">Zoom In</button>
-    <button @click="zoomOut()">Zoom Out</button> -->
-
-    <!-- <div id="pdf-wrapper" style="max-height: 90vh; overflow-y: scroll; overflow-x: hidden;"> -->
     <div id="pdf-wrapper" :style="{'width': width, 'height': height}" :data-width="width" :data-height="height">
       <pdf-toolbar
         v-if="controller"
         @click-zoomin="zoomIn()"
         @click-zoomout="zoomOut()"
-        @click-sign="dialog = true"
+        @click-sign="addSignatureDialog = true"
         @click-export="exportPDF()"
-        @update:page="changePage($event)"
+        @click-draw="toggleDrawingMode()"
+        @click-insert-image="insertImageDialog = true"
         :page="controller.currentPage"
+        @update:page="changePage($event)"
+        :is-drawing="drawing.enable"
+        :drawing-pen="drawing.pen"
+        @update:drawing-pen="updateDrawingPen($event)"
         :total-pages="controller.totalPages"
       />
       <canvas id="canvas" />
     </div>
 
-    <signature-dialog v-model="dialog" @submit="insertSignature($event)"/>
+    <signature-dialog v-model="addSignatureDialog" @submit="insertSignature($event)"/>
+    <insert-image-dialog v-model="insertImageDialog" @submit="insertImage($event)" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { fabric } from 'fabric'
-import SignatureDialog from './signature-dialog.vue'
+import SignatureDialog from './pdf-signature-dialog.vue'
 import { PDFCanvasController, setupCanvas } from '@/lib/pdf-canvas'
 import { debounce } from 'lodash'
 import PdfToolbar from './pdf-toolbar.vue'
+import InsertImageDialog from './pdf-insert-image-dialog.vue'
 
 interface ResizeHandler {
   (e: UIEvent): void
@@ -38,7 +39,7 @@ interface ResizeHandler {
 
 export default Vue.extend({
   name: 'PdfSigner',
-  components: { SignatureDialog, PdfToolbar },
+  components: { SignatureDialog, PdfToolbar, InsertImageDialog },
   props: {
     pdfUrl: {
       type: String,
@@ -55,9 +56,17 @@ export default Vue.extend({
   },
   data () {
     return {
-      dialog: false,
+      addSignatureDialog: false,
+      insertImageDialog: false,
       controller: null as PDFCanvasController | null,
-      resizeHandler: null as ResizeHandler | null
+      resizeHandler: null as ResizeHandler | null,
+      drawing: {
+        pen: {
+          size: 1,
+          color: 'black'
+        },
+        enable: false
+      }
     }
   },
   mounted () {
@@ -123,6 +132,40 @@ export default Vue.extend({
       }
 
       this.controller.goToPage(n)
+    },
+
+    toggleDrawingMode () {
+      if (!this.drawing.enable) {
+        this.startDrawing()
+      } else {
+        this.stopDrawing()
+      }
+    },
+
+    startDrawing () {
+      this.drawing.enable = true
+      this.controller?.setDrawingMode(true)
+    },
+
+    stopDrawing () {
+      this.drawing.enable = false
+      this.controller?.setDrawingMode(false)
+    },
+
+    updateDrawingPen (pen: { size: number, color: string}) {
+      if (!this.controller) {
+        throw new Error('controller is not initialized')
+      }
+      this.drawing.pen = pen
+      this.controller.canvas.freeDrawingBrush.width = pen.size
+      this.controller.canvas.freeDrawingBrush.color = pen.color
+    },
+
+    insertImage (evt: any) {
+      if (!this.controller) {
+        throw new Error('controller is not initialized')
+      }
+      this.controller.insertImage(evt.file, evt.opacity, evt.insertToAllPages)
     }
   }
 })

@@ -1,64 +1,68 @@
 <template>
-  <div class="toolbar">
-    <div>
-      <div style="display: inline-block; width: 110px; text-align: center;">
-        <!-- <svg-icon type="mdi" :path="icons.pages" /> -->
-        <span style="font-size: 16px; height: 40px; position: relative; top: -5px; margin-left: 5px;">
-          Page
-          <input
-            class="page-input"
-            type="number"
-            onClick="this.setSelectionRange(0, this.value.length)"
-            :value="page"
-            @input="$emit('update:page', $event.target.value)"
-          /> / {{ totalPages }}
-        </span>
+  <div>
+    <div class="toolbar">
+      <!-- Left -->
+      <div>
+        <div style="display: inline-block; width: 110px; text-align: center;">
+          <span style="font-size: 16px; height: 40px; position: relative; top: -5px; margin-left: 5px;">
+            Page
+            <input
+              class="page-input"
+              type="number"
+              :value="page"
+              @input="$emit('update:page', $event.target.value)"
+            /> / {{ totalPages }}
+          </span>
+        </div>
+        <span style="font-size: 32px; width: 0;">&nbsp;</span>
+        <x-button v-if="!isMobile" :icon="icons.zoomOut" @click="$emit('click-zoomout')" />
+        <x-button v-if="!isMobile" :icon="icons.zoomIn" @click="$emit('click-zoomin')" />
       </div>
 
-      <span style="font-size: 32px; width: 0;">&nbsp;</span>
-
-      <button v-if="!isMobile" @click="$emit('click-zoomout')" class="icon-button">
-        <svg-icon type="mdi" :path="icons.zoomOut" />
-      </button>
-      <button v-if="!isMobile" @click="$emit('click-zoomin')" class="icon-button">
-        <svg-icon type="mdi" :path="icons.zoomIn" />
-      </button>
+      <!-- Right -->
+      <div>
+        <span style="font-size: 32px; width: 0;">&nbsp;</span>
+        <x-button :icon="icons.sign" text="Add Signature" @click="$emit('click-sign')" />
+        <x-button :icon="icons.drawPen" text="Draw" :class="{'active': isDrawing}" @click="$emit('click-draw')" />
+        <x-button :icon="icons.imagePlus" text="Image" @click="$emit('click-insert-image')" />
+        <x-button :icon="icons.export" @click="$emit('click-export')" />
+      </div>
     </div>
 
-    <div>
-      <span style="font-size: 32px; width: 0;">&nbsp;</span>
-      <button
-        @click="$emit('click-sign')"
-        class="icon-button"
-        style="width: 160px"
-      >
-        <svg-icon type="mdi" :path="icons.sign" />
-        <span style="font-size: 16px; position: relative; top: -5px">
-          Add Signature
-        </span>
-      </button>
-      <button @click="$emit('click-export')" class="icon-button" style="margin-right: 5px;">
-        <svg-icon type="mdi" :path="icons.export" />
-      </button>
+    <div class="sub-toolbar">
+      <pdf-drawing-toolbar
+        v-if="isDrawing"
+        :pen-size="drawingPen.size"
+        :pen-color="drawingPen.color"
+        @update:pen-size="$emit('update:drawing-pen', { ...drawingPen, size: $event })"
+        @update:pen-color="$emit('update:drawing-pen', { ...drawingPen, color: $event })"
+        @click-close="$emit('click-draw')"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import SvgIcon from './svg-icon.vue'
+// import xIcon from './common/x-icon.vue'
 import {
   mdiDownload,
   mdiMagnifyMinus,
   mdiMagnifyPlus,
   mdiSignatureFreehand,
-  mdiFormatListBulletedSquare
+  mdiFormatListBulletedSquare,
+  mdiDrawPen,
+  mdiImagePlus
 } from '@mdi/js'
 import { isMobile } from '@/utils/device'
+import PdfDrawingToolbar from './pdf-drawing-toolbar.vue'
+import xButton from './common/x-button.vue'
 
 export default Vue.extend({
   components: {
-    SvgIcon
+    // xIcon,
+    PdfDrawingToolbar,
+    xButton
   },
 
   props: {
@@ -68,6 +72,14 @@ export default Vue.extend({
     },
     totalPages: {
       type: Number,
+      required: true
+    },
+    isDrawing: {
+      type: Boolean,
+      default: false
+    },
+    drawingPen: {
+      type: Object,
       required: true
     }
   },
@@ -85,7 +97,9 @@ export default Vue.extend({
         zoomOut: mdiMagnifyMinus,
         sign: mdiSignatureFreehand,
         export: mdiDownload,
-        pages: mdiFormatListBulletedSquare
+        pages: mdiFormatListBulletedSquare,
+        drawPen: mdiDrawPen,
+        imagePlus: mdiImagePlus
       }
     }
   }
@@ -93,26 +107,8 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-@media(hover: hover) and (pointer: fine) {
-  .icon-button:hover {
-    background: #e0e0e0;
-  }
-}
-.icon-button {
-  width: 60px;
-  height: 40px;
-  background: #f5f5f5;
-  border: none;
-  border-radius: 5px;
-  transition-duration: 0.4s;
-  position: relative;
-  overflow: hidden;
-  -webkit-transition-duration: 0.4s; /* Safari */
-  margin: 2px;
-}
-
-.icon-button:active {
-  background: #cccccc;
+.active {
+  background: #aaaaaa;
 }
 
 .toolbar {

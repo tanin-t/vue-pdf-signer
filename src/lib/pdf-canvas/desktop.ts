@@ -32,6 +32,9 @@ export class DesktopCanvasController extends MobileCanvasController {
       if (this.canvas.getActiveObject()) {
         return
       }
+      if (this.canvas.isDrawingMode) {
+        return
+      }
       if (!opt.pointer) {
         throw new Error('`opt` is not TouchEvent')
       }
@@ -90,5 +93,9 @@ export class DesktopCanvasController extends MobileCanvasController {
     this.canvas.requestRenderAll()
 
     return hit
+  }
+
+  setDrawingMode (enable: boolean): void {
+    this.canvas.isDrawingMode = enable
   }
 }
