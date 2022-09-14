@@ -13,6 +13,7 @@
         <x-button
           style="width: calc(50% - 6px)"
           :icon="mdi.upload"
+          :auto-hide-text="false"
           text="Choose Photo"
           @click="openUploadFileDialog()"
         />
@@ -20,6 +21,7 @@
           v-if="isMobile"
           style="width: calc(50% - 6px)"
           :icon="mdi.camera"
+          :auto-hide-text="false"
           text="Take Photo"
           @click="openCamera()"
         />
@@ -64,11 +66,12 @@
       </div>
 
       <div class="image-config" style="margin-top: 10px; margin-bottom: 10px">
-        <table>
+        <table style="width: 100%">
           <tr>
             <td>Opacity</td>
             <td style="position: relative; top: 2px">
               <input
+                style="width: 100%;"
                 type="range"
                 min="0"
                 step="0.01"
@@ -87,7 +90,12 @@
       </div>
 
       <div style="text-align: center">
-        <x-button :icon="mdi.plus" text="Add Image" @click="submit()" />
+        <x-button
+          :icon="mdi.plus"
+          :auto-hide-text="false"
+          text="Add Image"
+          @click="submit()"
+        />
       </div>
     </div>
   </x-dialog>

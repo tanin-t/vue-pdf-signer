@@ -14,6 +14,8 @@
         :is-drawing="drawing.enable"
         :drawing-pen="drawing.pen"
         @update:drawing-pen="updateDrawingPen($event)"
+        :drawing-tool="drawing.tool"
+        @update:drawing-tool="updateDrawingTool($event)"
         :total-pages="controller.totalPages"
       />
       <canvas id="canvas" />
@@ -61,6 +63,7 @@ export default Vue.extend({
       controller: null as PDFCanvasController | null,
       resizeHandler: null as ResizeHandler | null,
       drawing: {
+        tool: 'pen',
         pen: {
           size: 1,
           color: 'black'
@@ -145,6 +148,8 @@ export default Vue.extend({
     startDrawing () {
       this.drawing.enable = true
       this.controller?.setDrawingMode(true)
+      this.updateDrawingPen({ size: 3, color: 'black' })
+      this.updateDrawingTool('pen')
     },
 
     stopDrawing () {
@@ -159,6 +164,12 @@ export default Vue.extend({
       this.drawing.pen = pen
       this.controller.canvas.freeDrawingBrush.width = pen.size
       this.controller.canvas.freeDrawingBrush.color = pen.color
+    },
+
+    updateDrawingTool (tool: 'pen'|'eraser') {
+      console.log('updateDrawingTool', { tool })
+      this.drawing.tool = tool
+      this.controller?.setDrawingTool(tool)
     },
 
     insertImage (evt: any) {

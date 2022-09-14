@@ -42,12 +42,19 @@ export default Vue.extend({
     color: {
       type: String,
       default: '#000000'
-    } as PropOptions<string>
+    } as PropOptions<string>,
+    autoHideText: {
+      type: Boolean,
+      default: true
+    }
   },
 
   computed: {
     showButtonText (): boolean {
-      return window.innerWidth > 400
+      if (!this.autoHideText) {
+        return true
+      }
+      return window.innerWidth > 550
     }
   }
 })

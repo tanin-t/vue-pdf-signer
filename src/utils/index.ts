@@ -1,3 +1,4 @@
+import { fabric } from 'fabric'
 import { PDFPage } from 'pdf-lib'
 
 interface Coords {

@@ -1,5 +1,9 @@
 <template>
   <div id="app">
+    <div class="meta">
+      window.innerWidth = {{ window.innerWidth }}<br>
+      window.innerHeight = {{ window.innerHeight }}<br>
+    </div>
     <pdf-signer ref="pdf" style="border: 1px solid #d0d0d0" pdfUrl="/example.pdf" />
 
     <div>External Control</div>
@@ -16,6 +20,11 @@ export default Vue.extend({
   name: 'App',
   components: {
     PdfSigner
+  },
+  computed: {
+    window () {
+      return window
+    }
   },
   methods: {
     async exportPDF () {

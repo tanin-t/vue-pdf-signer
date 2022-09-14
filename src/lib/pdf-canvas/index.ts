@@ -17,6 +17,7 @@ export interface PDFCanvasController {
   goToPage (pageNum: number): void
   exportPDF (): Promise<Uint8Array>
   setDrawingMode (enable: boolean): void
+  setDrawingTool (tool: 'pen'|'eraser'): void
   insertImage (file: File, opacity?: number, insertToAllPages?: boolean): void
 }
 

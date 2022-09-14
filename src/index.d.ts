@@ -1,7 +1,3 @@
-declare module 'fabric-with-gestures' {
-
-}
-
 // https://mozilla.github.io/pdf.js/api/draft/module-pdfjsLib-PDFPageProxy.html
 export interface PDFPageProxy {
   getViewport(...arg: any[])

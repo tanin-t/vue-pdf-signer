@@ -36,6 +36,11 @@ export class MobileCanvasController implements PDFCanvasController {
   currentPage = 1
   totalPages = 1
 
+  drawing = {
+    isDrawing: false,
+    tool: 'pen'
+  }
+
   constructor (canvasId: string) {
     this.canvas = new fabric.Canvas(canvasId)
   }
@@ -102,6 +107,9 @@ export class MobileCanvasController implements PDFCanvasController {
     this.canvas.on('mouse:move', (opt) => {
       if (!opt.pointer) {
         throw new Error('`opt` is not TouchEvent')
+      }
+      if (this.drawing.isDrawing) {
+        return
       }
 
       const evt = opt.e as never as TouchEvent
@@ -217,6 +225,20 @@ export class MobileCanvasController implements PDFCanvasController {
       throw new Error('`this.canvas` is not initialized')
     }
 
+    // while in drawing mode, if user touche with 2 or more finger, disable drawing mode temporary
+    this.canvas.on('mouse:down:before', (opt) => {
+      const evt = opt.e as never as TouchEvent
+
+      if (this.drawing.isDrawing && this.drawing.tool === 'pen') {
+        if (evt.touches.length === 1) {
+          this.canvas.isDrawingMode = true
+        }
+        if (evt.touches.length > 1) {
+          this.canvas.isDrawingMode = false
+        }
+      }
+    })
+
     this.canvas.on('path:created', (evt: any) => {
       const p = evt.path as never as FabricObject
       p.attrs = { type: 'signature' }
@@ -225,6 +247,36 @@ export class MobileCanvasController implements PDFCanvasController {
       p.lockRotation = true
       p.lockScalingX = true
       p.lockScalingY = true
+      p.on('mouseover', (evt) => {
+        console.log('mouseover', evt)
+        const e = evt.e as MouseEvent | TouchEvent
+
+        if (e instanceof MouseEvent) {
+          if (e.buttons === 1 && this.drawing.tool === 'eraser') {
+            this.canvas.remove(p)
+          }
+        }
+
+        if (e instanceof TouchEvent) {
+          if (e.touches.length === 1 && this.drawing.tool === 'eraser') {
+            this.canvas.remove(p)
+          }
+        }
+      })
+      p.on('mousedown', (evt) => {
+        console.log('mousedown', evt)
+        const e = evt.e as MouseEvent | TouchEvent
+        if (e instanceof MouseEvent) {
+          if (e.buttons === 1 && this.drawing.tool === 'eraser') {
+            this.canvas.remove(p)
+          }
+        }
+        if (e instanceof TouchEvent) {
+          if (e.touches.length === 1 && this.drawing.tool === 'eraser') {
+            this.canvas.remove(p)
+          }
+        }
+      })
     })
   }
 
@@ -364,6 +416,24 @@ export class MobileCanvasController implements PDFCanvasController {
 
   setDrawingMode (enable: boolean): void {
     this.canvas.isDrawingMode = enable
+
+    if (enable) {
+      this.drawing.isDrawing = true
+      this.drawing.tool = 'pen'
+    } else {
+      this.drawing.isDrawing = false
+    }
+  }
+
+  setDrawingTool (tool: 'pen' | 'eraser'): void {
+    this.drawing.tool = tool
+
+    if (this.drawing.tool === 'pen') {
+      this.canvas.isDrawingMode = true
+    }
+    if (this.drawing.tool === 'eraser') {
+      this.canvas.isDrawingMode = false
+    }
   }
 
   insertImage (file: File, opacity = 1, insertToAllPages = false): void {

@@ -34,8 +34,10 @@
         v-if="isDrawing"
         :pen-size="drawingPen.size"
         :pen-color="drawingPen.color"
+        :tool="drawingTool"
         @update:pen-size="$emit('update:drawing-pen', { ...drawingPen, size: $event })"
         @update:pen-color="$emit('update:drawing-pen', { ...drawingPen, color: $event })"
+        @update:tool="$emit('update:drawing-tool', $event)"
         @click-close="$emit('click-draw')"
       />
     </div>
@@ -80,6 +82,10 @@ export default Vue.extend({
     },
     drawingPen: {
       type: Object,
+      required: true
+    },
+    drawingTool: {
+      type: String,
       required: true
     }
   },
