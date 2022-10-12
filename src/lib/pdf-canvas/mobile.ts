@@ -437,16 +437,40 @@ export class MobileCanvasController implements PDFCanvasController {
   }
 
   insertImage (file: File, opacity = 1, insertToAllPages = false): void {
-    fabric.Image.fromURL(URL.createObjectURL(file), (img) => {
-      img.set({
-        left: 100,
-        top: 100,
-        opacity: opacity
+    if (insertToAllPages) {
+      const objs = this.canvas.getObjects() as FabricObject[]
+      const pages = objs.filter(x => _.get(x, 'attrs.type') === 'pdf-page')
+
+      for (const page of pages) {
+        fabric.Image.fromURL(URL.createObjectURL(file), (img) => {
+          if (page.top === undefined || page.height === undefined || img.height === undefined) {
+            throw new Error('This should not happened')
+          }
+
+          img.scaleToWidth(page.width || 300)
+          img.set({
+            top: page.top + (page.height / 2) - (img.height / 2),
+            left: page.left,
+            opacity: opacity
+          });
+
+          //
+          (img as never as FabricObject).attrs = { type: 'image' }
+          this.canvas.add(img)
+        })
+      }
+    } else {
+      fabric.Image.fromURL(URL.createObjectURL(file), (img) => {
+        img.set({
+          left: 100,
+          top: 100,
+          opacity: opacity
+        })
+        img.scaleToWidth(300);
+        (img as never as FabricObject).attrs = { type: 'image' }
+        this.canvas.viewportCenterObject(img)
+        this.canvas.add(img)
       })
-      img.scaleToWidth(300);
-      (img as never as FabricObject).attrs = { type: 'image' }
-      this.canvas.viewportCenterObject(img)
-      this.canvas.add(img)
-    })
+    }
   }
 }

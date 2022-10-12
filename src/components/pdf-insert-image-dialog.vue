@@ -80,12 +80,12 @@
               />
             </td>
           </tr>
-          <!-- <tr>
-            <td>Insert as watermark</td>
+          <tr>
+            <td>Insert to all pages</td>
             <td style="position: relative; top: 2px">
               <input v-model="insertToAllPages" type="checkbox" />
             </td>
-          </tr> -->
+          </tr>
         </table>
       </div>
 
