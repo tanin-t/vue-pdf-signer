@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="pdf-wrapper" :style="{'width': width, 'height': height}" :data-width="width" :data-height="height">
+    <div id="pdf-wrapper" :style="{'width': width, 'height': height}" :data-width="width" :data-height="height" tabindex="1" @keydown="onCanvasKeydown($event)">
       <pdf-toolbar
         v-if="controller"
         @click-zoomin="zoomIn()"
@@ -177,7 +177,25 @@ export default Vue.extend({
         throw new Error('controller is not initialized')
       }
       this.controller.insertImage(evt.file, evt.opacity, evt.insertToAllPages)
+    },
+
+    onCanvasKeydown (e: KeyboardEvent) {
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        if (!this.controller?.canvas) return
+
+        const canvas = this.controller.canvas
+        const activeObject = canvas?.getActiveObject()
+        canvas.remove(activeObject)
+      }
     }
   }
 })
 </script>
+
+<style scoped>
+#pdf-wrapper:focus {
+  /* border-style: none; */
+  border: none;
+  outline: none;
+}
+</style>

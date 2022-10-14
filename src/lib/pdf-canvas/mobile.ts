@@ -248,7 +248,7 @@ export class MobileCanvasController implements PDFCanvasController {
       p.lockScalingX = true
       p.lockScalingY = true
       p.on('mouseover', (evt) => {
-        console.log('mouseover', evt)
+        // console.log('mouseover', evt)
         const e = evt.e as MouseEvent | TouchEvent
 
         if (e instanceof MouseEvent) {
@@ -264,7 +264,7 @@ export class MobileCanvasController implements PDFCanvasController {
         }
       })
       p.on('mousedown', (evt) => {
-        console.log('mousedown', evt)
+        // console.log('mousedown', evt)
         const e = evt.e as MouseEvent | TouchEvent
         if (e instanceof MouseEvent) {
           if (e.buttons === 1 && this.drawing.tool === 'eraser') {
