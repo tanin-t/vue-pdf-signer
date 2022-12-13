@@ -119,10 +119,13 @@ export class PDFController {
     const images = objs.filter(x => _.get(x, 'attrs.type') === 'image')
 
     const results = []
-    for (const page of pages) {
+    for (const i in pages) {
+      const page = pages[i]
+
       results.push({
+        page_num: i,
         page: page,
-        signatures: signatures.filter(s => s.isContainedWithinObject(page)),
+        signatures: signatures.filter(s => s.isContainedWithinObject(page, true)),
         images: images
       })
     }
