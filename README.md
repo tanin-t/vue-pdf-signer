@@ -21,5 +21,7 @@ npm publish
 git add .
 git commit -m "<message>"
 git push
+
 git tag -a <version-number> -m "<message>"
+git push --tags
 ```
