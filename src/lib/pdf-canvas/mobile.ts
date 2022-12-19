@@ -12,6 +12,7 @@ interface TouchPoint {
 export class MobileCanvasController implements PDFCanvasController {
   canvas: fabric.Canvas
   pdfUrl?: string
+  imageUrl?: string
 
   dragging = {
     isDragging: false,
@@ -45,7 +46,44 @@ export class MobileCanvasController implements PDFCanvasController {
     this.canvas = new fabric.Canvas(canvasId)
   }
 
-  async setup (pdfUrl: string) {
+  async setup (src: string) {
+    const ext = _.last(src.split('.'))
+
+    if (!ext) {
+      throw new Error('Invalid image/pdf src')
+    }
+
+    if (ext === 'pdf') {
+      return this.setupPDF(src)
+    }
+
+    if (['jpg', 'jpeg', 'png'].includes(ext)) {
+      return this.setupImage(src)
+    }
+
+    throw new Error(`${ext} is not a supported file type`)
+  }
+
+  async setupImage (imageUrl: string) {
+    console.log('setupImage')
+    const image = await this.drawImage(imageUrl)
+    const pages = [image]
+    console.log({ image })
+    this.setupCanvasDimensions(pages)
+    this.setupPanAndZoomBoundary(pages)
+    this.setupPanAndZoomEventHandler()
+    this.setupDrawingEventHandler()
+
+    this.totalPages = 1
+
+    // Zoom out - fit width
+    this.canvas.setZoom(this.boundary.zoomOut)
+
+    // Center page with viewport
+    this.canvas.viewportCenterObjectH(image)
+  }
+
+  async setupPDF (pdfUrl: string) {
     const pages = await this.drawPDFPages(pdfUrl)
     this.setupCanvasDimensions(pages)
     this.setupPanAndZoomBoundary(pages)
@@ -209,7 +247,7 @@ export class MobileCanvasController implements PDFCanvasController {
     this.boundary.zoomOut = (this.canvas.getWidth() / pages[0].getScaledWidth())
   }
 
-  async drawPDFPages (pdfUrl: string) {
+  async drawPDFPages (pdfUrl: string): Promise<fabric.Image[]> {
     this.pdfUrl = pdfUrl
     const pages = await renderPDF(pdfUrl)
     for (const page of pages) {
@@ -218,6 +256,19 @@ export class MobileCanvasController implements PDFCanvasController {
     }
 
     return pages
+  }
+
+  drawImage (imageUrl: string): Promise<fabric.Image> {
+    this.imageUrl = imageUrl
+    return new Promise((resolve) => {
+      fabric.Image.fromURL(imageUrl, (img) => {
+        const image = img as never as FabricObject
+        image.set('selectable', false)
+        image.attrs = { type: 'pdf-page' }
+        this.canvas.add(image)
+        resolve(img)
+      })
+    })
   }
 
   setupDrawingEventHandler () {
@@ -412,6 +463,13 @@ export class MobileCanvasController implements PDFCanvasController {
     await PDFController.mergeAnnotations(pdfDoc, this.canvas)
     const pdfBytes = await pdfDoc.save()
     return pdfBytes
+  }
+
+  async exportPNG (): Promise<Blob> {
+    const dataURL = this.canvas.toDataURL({ format: 'png' })
+    const res = await fetch(dataURL)
+    const blob = await res.blob()
+    return blob
   }
 
   setDrawingMode (enable: boolean): void {

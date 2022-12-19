@@ -8,7 +8,8 @@ export interface PDFCanvasController {
   totalPages: number
   currentPage: number
 
-  setup (canvasId: string, pdfUrl: string): void
+  setupImage (imageUrl: string): void
+  setupPDF (pdfUrl: string): void
   zoomIn (): void
   zoomOut (): void
   addSignature (signature: fabric.Group): void
@@ -16,20 +17,21 @@ export interface PDFCanvasController {
   resizeCanvas (): void
   goToPage (pageNum: number): void
   exportPDF (): Promise<Uint8Array>
+  exportPNG (): Promise<Blob>
   setDrawingMode (enable: boolean): void
   setDrawingTool (tool: 'pen'|'eraser'): void
   insertImage (file: File, opacity?: number, insertToAllPages?: boolean): void
 }
 
-export function setupCanvas (canvasId: string, pdfUrl: string): PDFCanvasController {
+export function setupCanvas (canvasId: string, src: string): PDFCanvasController {
   setupObjectControls()
   if (isMobile()) {
     const controller = new MobileCanvasController(canvasId)
-    controller.setup(pdfUrl)
+    controller.setup(src)
     return controller
   } else {
     const controller = new DesktopCanvasController(canvasId)
-    controller.setup(pdfUrl)
+    controller.setup(src)
     return controller
   }
 }

@@ -6,7 +6,7 @@
         @click-zoomin="zoomIn()"
         @click-zoomout="zoomOut()"
         @click-sign="addSignatureDialog = true"
-        @click-export="exportPDF()"
+        @click-export="exportData()"
         @click-draw="toggleDrawingMode()"
         @click-insert-image="insertImageDialog = true"
         :page="controller.currentPage"
@@ -28,10 +28,11 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { debounce, last } from 'lodash'
 import { fabric } from 'fabric'
 import SignatureDialog from './pdf-signature-dialog.vue'
 import { PDFCanvasController, setupCanvas } from '@/lib/pdf-canvas'
-import { debounce } from 'lodash'
+import { openURL, downloadURL } from '@/utils/window'
 import PdfToolbar from './pdf-toolbar.vue'
 import InsertImageDialog from './pdf-insert-image-dialog.vue'
 
@@ -45,7 +46,15 @@ export default Vue.extend({
   props: {
     pdfUrl: {
       type: String,
-      required: true
+      required: false
+    },
+    imageUrl: {
+      type: String,
+      required: false
+    },
+    src: {
+      type: String,
+      required: false
     },
     width: {
       type: [Number, String],
@@ -72,8 +81,25 @@ export default Vue.extend({
       }
     }
   },
+
+  computed: {
+    canvasSrc (): string {
+      return this.imageUrl || this.pdfUrl || this.src
+    },
+
+    srcType (): 'pdf'|'image' {
+      const fileExt = last(this.src.split('.'))
+
+      if (fileExt === 'pdf') {
+        return 'pdf'
+      }
+
+      return 'image'
+    }
+  },
+
   mounted () {
-    this.controller = setupCanvas('canvas', this.pdfUrl)
+    this.controller = setupCanvas('canvas', this.canvasSrc)
 
     this.resizeHandler = debounce(() => {
       if (!this.controller) {
@@ -100,6 +126,23 @@ export default Vue.extend({
     zoomOut () {
       this.controller?.zoomOut()
     },
+    async exportData () {
+      if (this.srcType === 'pdf') {
+        this.exportPDF()
+      }
+      if (this.srcType === 'image') {
+        this.exportPNG()
+      }
+    },
+    async exportPNG () {
+      if (!this.controller) {
+        throw new Error('`this.controller` is not initialized')
+      }
+
+      const imgBlob = await this.controller.exportPNG()
+      const url = window.URL.createObjectURL(imgBlob)
+      downloadURL(url)
+    },
     async exportPDF () {
       if (!this.controller) {
         throw new Error('`this.controller` is not initialized')
@@ -107,12 +150,8 @@ export default Vue.extend({
 
       const pdfBytes = await this.controller.exportPDF()
       const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' })
-
       const url = window.URL.createObjectURL(pdfBlob)
-      const newtab = window.open(url, '_blank')
-      if (!newtab || newtab.closed) {
-        window.location.href = url
-      }
+      openURL(url)
     },
 
     changePage (pageNum: string) {
