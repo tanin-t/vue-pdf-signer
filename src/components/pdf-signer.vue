@@ -1,6 +1,13 @@
 <template>
   <div>
-    <div id="pdf-wrapper" :style="{'width': width, 'height': height}" :data-width="width" :data-height="height" tabindex="1" @keydown="onCanvasKeydown($event)">
+    <div
+      id="pdf-wrapper"
+      :style="{'width': width, 'height': height, margin: 'auto'}"
+      :data-width="width"
+      :data-height="height"
+      tabindex="1"
+      @keydown="onCanvasKeydown($event)"
+    >
       <pdf-toolbar
         v-if="controller"
         @click-zoomin="zoomIn()"

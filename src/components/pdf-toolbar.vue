@@ -20,7 +20,7 @@
       </div>
 
       <!-- Right -->
-      <div>
+      <div style="padding-right: 4px;">
         <span style="font-size: 32px; width: 0;">&nbsp;</span>
         <x-button :icon="icons.sign" text="Add Signature" @click="$emit('click-sign')" />
         <x-button :icon="icons.drawPen" text="Draw" :class="{'active': isDrawing}" @click="$emit('click-draw')" />

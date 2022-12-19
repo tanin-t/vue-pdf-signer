@@ -5,7 +5,7 @@
       window.innerHeight = {{ window.innerHeight }}<br>
     </div>
 
-    <pdf-signer :key="src" :src="src" ref="pdf" style="border: 1px solid #d0d0d0" />
+    <pdf-signer :key="src" :src="src" ref="pdf" width="1200px" style="border: 1px solid #d0d0d0;" />
 
     <div>External Control</div>
     <button @click="exportPDF()">Export PDF</button>
@@ -70,7 +70,7 @@ export default Vue.extend({
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
-  max-width: 900px;
+  max-width: 1202px;
   margin: auto;
 }
 </style>
