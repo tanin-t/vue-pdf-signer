@@ -4,6 +4,7 @@ import { PDFCanvasController } from '.'
 import { renderPDF } from './common'
 import _, { wrap } from 'lodash'
 import { PDFController } from '../pdf-renderer'
+import { getFileExtension } from '@/utils'
 
 interface TouchPoint {
   x: number
@@ -47,21 +48,21 @@ export class MobileCanvasController implements PDFCanvasController {
   }
 
   async setup (src: string) {
-    const ext = _.last(src.split('.'))
+    const fileExt = getFileExtension(src)
 
-    if (!ext) {
+    if (!fileExt) {
       throw new Error('Invalid image/pdf src')
     }
 
-    if (ext === 'pdf') {
+    if (fileExt === 'pdf') {
       return this.setupPDF(src)
     }
 
-    if (['jpg', 'jpeg', 'png'].includes(ext)) {
+    if (['jpg', 'jpeg', 'png'].includes(fileExt)) {
       return this.setupImage(src)
     }
 
-    throw new Error(`${ext} is not a supported file type`)
+    throw new Error(`${fileExt} is not a supported file type`)
   }
 
   async setupImage (imageUrl: string) {
@@ -267,6 +268,8 @@ export class MobileCanvasController implements PDFCanvasController {
         image.attrs = { type: 'pdf-page' }
         this.canvas.add(image)
         resolve(img)
+      }, {
+        crossOrigin: 'anonymous'
       })
     })
   }

@@ -1,6 +1,10 @@
 import { fabric } from 'fabric'
 import { PDFPage } from 'pdf-lib'
 
+export * from './device'
+export * from './path'
+export * from './window'
+
 interface Coords {
   x: number,
   y: number

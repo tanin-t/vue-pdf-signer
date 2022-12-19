@@ -28,11 +28,11 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { debounce, last } from 'lodash'
+import { debounce } from 'lodash'
 import { fabric } from 'fabric'
 import SignatureDialog from './pdf-signature-dialog.vue'
 import { PDFCanvasController, setupCanvas } from '@/lib/pdf-canvas'
-import { openURL, downloadURL } from '@/utils/window'
+import { openURL, downloadURL, getFileExtension } from '@/utils'
 import PdfToolbar from './pdf-toolbar.vue'
 import InsertImageDialog from './pdf-insert-image-dialog.vue'
 
@@ -88,13 +88,15 @@ export default Vue.extend({
     },
 
     srcType (): 'pdf'|'image' {
-      const fileExt = last(this.src.split('.'))
+      const fileExt = getFileExtension(this.canvasSrc)
 
       if (fileExt === 'pdf') {
         return 'pdf'
+      } else if (['jpg', 'jpeg', 'png'].includes(fileExt)) {
+        return 'image'
+      } else {
+        throw new Error('Invalid file type')
       }
-
-      return 'image'
     }
   },
 

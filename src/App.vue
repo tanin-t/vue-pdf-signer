@@ -27,7 +27,7 @@ export default Vue.extend({
   },
   data () {
     return {
-      src: '/example.pdf'
+      src: '/example.jpg'
     }
   },
   computed: {
