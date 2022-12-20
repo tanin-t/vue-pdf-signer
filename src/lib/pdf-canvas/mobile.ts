@@ -47,22 +47,27 @@ export class MobileCanvasController implements PDFCanvasController {
     this.canvas = new fabric.Canvas(canvasId)
   }
 
-  async setup (src: string) {
-    const fileExt = getFileExtension(src)
+  async setup (src: string, srcType?: 'image'|'pdf') {
+    if (!srcType) {
+      const fileExt = getFileExtension(src)
+      if (fileExt === 'pdf') {
+        srcType = 'pdf'
+      }
 
-    if (!fileExt) {
-      throw new Error('Invalid image/pdf src')
+      if (['jpg', 'jpeg', 'png'].includes(fileExt)) {
+        srcType = 'image'
+      }
+
+      throw new Error(`${fileExt} is not a supported file type`)
     }
 
-    if (fileExt === 'pdf') {
+    if (srcType === 'pdf') {
       return this.setupPDF(src)
     }
 
-    if (['jpg', 'jpeg', 'png'].includes(fileExt)) {
+    if (srcType === 'image') {
       return this.setupImage(src)
     }
-
-    throw new Error(`${fileExt} is not a supported file type`)
   }
 
   async setupImage (imageUrl: string) {

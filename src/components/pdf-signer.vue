@@ -116,7 +116,7 @@ export default Vue.extend({
   },
 
   mounted () {
-    this.controller = setupCanvas('canvas', this.canvasSrc)
+    this.controller = setupCanvas('canvas', this.canvasSrc, this.srcType)
 
     this.resizeHandler = debounce(() => {
       if (!this.controller) {

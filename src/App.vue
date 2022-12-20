@@ -5,7 +5,7 @@
       window.innerHeight = {{ window.innerHeight }}<br>
     </div>
 
-    <pdf-signer :key="src" :src="src" ref="pdf" width="1200px" style="border: 1px solid #d0d0d0;" />
+    <pdf-signer :key="src" pdf-url="https://docs.google.com/document/d/1uCUmohUoPD35AdwpjJs7NQ4q8NLvjzKxxVBrLyAyALk/export?format=pdf" ref="pdf" width="1200px" style="border: 1px solid #d0d0d0;" />
 
     <div>External Control</div>
     <button @click="exportPDF()">Export PDF</button>
