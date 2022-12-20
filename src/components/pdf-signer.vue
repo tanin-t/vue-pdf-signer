@@ -95,6 +95,14 @@ export default Vue.extend({
     },
 
     srcType (): 'pdf'|'image' {
+      if (this.pdfUrl) {
+        return 'pdf'
+      }
+
+      if (this.imageUrl) {
+        return 'image'
+      }
+
       const fileExt = getFileExtension(this.canvasSrc)
 
       if (fileExt === 'pdf') {
