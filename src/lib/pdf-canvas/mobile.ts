@@ -2,7 +2,7 @@ import { FabricObject } from '@/types/fabric'
 import { fabric } from 'fabric'
 import { PDFCanvasController } from '.'
 import { PDF_PAGE_SPACE, renderPDF } from './common'
-import _, { wrap } from 'lodash'
+import _ from 'lodash'
 import { PDFController } from '../pdf-renderer'
 import { getFileExtension } from '@/utils'
 

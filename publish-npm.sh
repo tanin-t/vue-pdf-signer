@@ -7,7 +7,7 @@ set -e
 set -u
 
 # Enable debugging output
-# set -x
+set -x
 
 # Change to the directory that contains the current script
 cd "$(dirname "$0")"

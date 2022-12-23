@@ -1,7 +1,7 @@
 {
   "name": "vue-pdf-signer",
   "author": "tanin-t",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "private": false,
   "main": "./dist/vue-pdf-signer.common.js",
   "scripts": {
@@ -10,6 +10,7 @@
     "build": "vue-cli-service build",
     "build-lib": "vue-cli-service build --target lib --inline-vue --name vue-pdf-signer src/lib.ts",
     "test:unit": "vue-cli-service test:unit",
+    "publish-npm": "bash publish-npm.sh",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
