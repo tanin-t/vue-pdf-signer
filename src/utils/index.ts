@@ -4,6 +4,7 @@ import { PDFPage } from 'pdf-lib'
 export * from './device'
 export * from './path'
 export * from './window'
+export * from './timer'
 
 interface Coords {
   x: number,

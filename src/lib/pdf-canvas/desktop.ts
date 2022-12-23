@@ -83,16 +83,16 @@ export class DesktopCanvasController extends MobileCanvasController {
   }
 
   scrollPan (deltaX: number, deltaY: number) {
-    const vpt = this.canvas.viewportTransform
-    if (vpt) {
-      vpt[4] = vpt[4] - deltaX
-      vpt[5] = vpt[5] - deltaY
-    }
-    const hit = this.moveViewportIntoBoundary()
+    const canvasVpt = [...(this.canvas.viewportTransform || [])]
+    canvasVpt[4] = canvasVpt[4] - deltaX
+    canvasVpt[5] = canvasVpt[5] - deltaY
+
+    const { reach, vpt } = this.moveViewportIntoBoundary(canvasVpt)
+    this.canvas.setViewportTransform(vpt)
     this.updateCurrentPage()
     this.canvas.requestRenderAll()
 
-    return hit
+    return reach
   }
 
   setDrawingMode (enable: boolean): void {

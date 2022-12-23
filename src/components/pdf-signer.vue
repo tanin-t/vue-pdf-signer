@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div id="pdf-container">
     <div
       id="pdf-wrapper"
-      :style="{'width': width, 'height': height, margin: 'auto'}"
+      :style="{margin: 'auto'}"
       :data-width="width"
       :data-height="height"
       tabindex="1"
@@ -38,8 +38,8 @@ import Vue from 'vue'
 import { debounce } from 'lodash'
 import { fabric } from 'fabric'
 import SignatureDialog from './pdf-signature-dialog.vue'
-import { PDFCanvasController, setupCanvas } from '@/lib/pdf-canvas'
-import { openURL, downloadURL, getFileExtension } from '@/utils'
+import { PDFCanvasController, setupCanvas, drawRulers } from '@/lib/pdf-canvas'
+import { openURL, downloadURL, getFileExtension, wait } from '@/utils'
 import PdfToolbar from './pdf-toolbar.vue'
 import InsertImageDialog from './pdf-insert-image-dialog.vue'
 
@@ -62,14 +62,6 @@ export default Vue.extend({
     src: {
       type: String,
       required: false
-    },
-    width: {
-      type: [Number, String],
-      default: ''
-    },
-    height: {
-      type: [Number, String],
-      default: ''
     }
   },
   data () {
@@ -85,7 +77,9 @@ export default Vue.extend({
           color: 'black'
         },
         enable: false
-      }
+      },
+      width: 0,
+      height: 0
     }
   },
 
@@ -116,12 +110,20 @@ export default Vue.extend({
   },
 
   mounted () {
-    this.controller = setupCanvas('canvas', this.canvasSrc, this.srcType)
+    (async () => {
+      this.resizeWrapper()
+      await wait(200)
+      this.controller = await setupCanvas('canvas', this.canvasSrc, this.srcType)
+      // drawRulers(this.controller.canvas)
+      this.$emit('ready')
+    })()
 
-    this.resizeHandler = debounce(() => {
+    this.resizeHandler = debounce(async () => {
       if (!this.controller) {
         throw new Error('`this.controller` is not initialized')
       }
+      this.resizeWrapper()
+      await wait(200)
       this.controller.resizeCanvas()
     }, 500)
 
@@ -158,6 +160,7 @@ export default Vue.extend({
 
       const imgBlob = await this.controller.exportPNG()
       const url = window.URL.createObjectURL(imgBlob)
+      // openURL(url)
       downloadURL(url)
     },
     async exportPDF () {
@@ -243,8 +246,15 @@ export default Vue.extend({
         const activeObject = canvas?.getActiveObject()
         canvas.remove(activeObject)
       }
+    },
+
+    resizeWrapper () {
+      const container = document.getElementById('pdf-container')
+      this.width = container?.offsetWidth || 0
+      this.height = (container?.offsetHeight || 50) - 50
     }
   }
+
 })
 </script>
 

@@ -23,15 +23,15 @@ export interface PDFCanvasController {
   insertImage (file: File, opacity?: number, insertToAllPages?: boolean): void
 }
 
-export function setupCanvas (canvasId: string, src: string, srcType: 'image'|'pdf'): PDFCanvasController {
+export async function setupCanvas (canvasId: string, src: string, srcType: 'image'|'pdf'): Promise<PDFCanvasController> {
   setupObjectControls()
   if (isMobile()) {
     const controller = new MobileCanvasController(canvasId)
-    controller.setup(src, srcType)
+    await controller.setup(src, srcType)
     return controller
   } else {
     const controller = new DesktopCanvasController(canvasId)
-    controller.setup(src, srcType)
+    await controller.setup(src, srcType)
     return controller
   }
 }

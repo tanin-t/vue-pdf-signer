@@ -1,7 +1,7 @@
 import { FabricObject } from '@/types/fabric'
 import { fabric } from 'fabric'
 import { PDFCanvasController } from '.'
-import { renderPDF } from './common'
+import { PDF_PAGE_SPACE, renderPDF } from './common'
 import _, { wrap } from 'lodash'
 import { PDFController } from '../pdf-renderer'
 import { getFileExtension } from '@/utils'
@@ -35,6 +35,15 @@ export class MobileCanvasController implements PDFCanvasController {
     zoomOut: 0.1
   }
 
+  hardBoundary = {
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    zoomIn: 2,
+    zoomOut: 0.1
+  }
+
   currentPage = 1
   totalPages = 1
 
@@ -42,6 +51,11 @@ export class MobileCanvasController implements PDFCanvasController {
     isDrawing: false,
     tool: 'pen'
   }
+
+  orientation = 'landscape' as 'landscape' | 'portrait'
+
+  pages = [] as fabric.Image[]
+  debugLines = [] as fabric.Object[]
 
   constructor (canvasId: string) {
     this.canvas = new fabric.Canvas(canvasId)
@@ -61,51 +75,82 @@ export class MobileCanvasController implements PDFCanvasController {
       throw new Error(`${fileExt} is not a supported file type`)
     }
 
+    let pages = [] as fabric.Image[]
     if (srcType === 'pdf') {
-      return this.setupPDF(src)
+      pages = await this.setupPDF(src)
     }
 
     if (srcType === 'image') {
-      return this.setupImage(src)
+      pages = await this.setupImage(src)
     }
+
+    const totalWidth = pages[0].getScaledWidth()
+    const totalHeight = _.sum(pages.map(p => p.getScaledHeight()))
+    this.pages = pages
+    this.orientation = totalWidth > totalHeight ? 'landscape' : 'portrait'
+    this.totalPages = pages.length
+    this.centerViewport()
   }
 
   async setupImage (imageUrl: string) {
-    console.log('setupImage')
     const image = await this.drawImage(imageUrl)
     const pages = [image]
-    console.log({ image })
-    this.setupCanvasDimensions(pages)
-    this.setupPanAndZoomBoundary(pages)
+    this.setupCanvasDimensions()
+    this.setupZoomOutBoundary(pages)
+    this.setupPanBoundary(pages)
     this.setupPanAndZoomEventHandler()
     this.setupDrawingEventHandler()
+    return pages
+  }
 
-    this.totalPages = 1
+  drawDebugLines () {
+    const zoom = this.canvas.getZoom()
+    const height = this.canvas.getHeight()
+    const width = this.canvas.getWidth()
 
-    // Zoom out - fit width
-    this.canvas.setZoom(this.boundary.zoomOut)
+    const scaledWidth = width * (1 / zoom)
+    const scaledHeight = height * (1 / zoom)
+    console.log('drawDebugLine', { scaledWidth, scaledHeight })
+    const topLine = new fabric.Line([0, 0, scaledWidth, 0], { stroke: 'red', strokeWidth: 10 })
+    const leftLine = new fabric.Line([0, 0, 0, scaledHeight], { stroke: 'red', strokeWidth: 10 })
+    const rightLine = new fabric.Line([scaledWidth - 10, 0, scaledWidth - 10, scaledHeight - 10], { stroke: 'red', strokeWidth: 10 })
+    const bottomLine = new fabric.Line([0, scaledHeight - 10, scaledWidth - 10, scaledHeight - 10], { stroke: 'red', strokeWidth: 10 })
+    this.canvas.add(topLine)
+    this.canvas.add(leftLine)
+    this.canvas.add(rightLine)
+    this.canvas.add(bottomLine)
+  }
 
-    // Center page with viewport
-    this.canvas.viewportCenterObjectH(image)
+  drawDebugPanBoundary () {
+    for (const line of this.debugLines) {
+      this.canvas.remove(line)
+    }
+
+    const b = this.boundary
+    const topLine = new fabric.Line([b.left, b.top, b.right, b.top], { stroke: 'blue', strokeWidth: 10 })
+    const leftLine = new fabric.Line([b.left, b.top, b.left, b.bottom], { stroke: 'blue', strokeWidth: 10 })
+    const rightLine = new fabric.Line([b.right - 10, b.top, b.right - 10, b.bottom], { stroke: 'blue', strokeWidth: 10 })
+    const bottomLine = new fabric.Line([b.left, b.bottom - 10, b.right, b.bottom - 10], { stroke: 'blue', strokeWidth: 10 })
+    this.debugLines = [
+      topLine,
+      leftLine,
+      rightLine,
+      bottomLine
+    ]
+    this.canvas.add(topLine)
+    this.canvas.add(leftLine)
+    this.canvas.add(rightLine)
+    this.canvas.add(bottomLine)
   }
 
   async setupPDF (pdfUrl: string) {
     const pages = await this.drawPDFPages(pdfUrl)
-    this.setupCanvasDimensions(pages)
-    this.setupPanAndZoomBoundary(pages)
+    this.setupCanvasDimensions()
+    this.setupZoomOutBoundary(pages)
+    this.setupPanBoundary(pages)
     this.setupPanAndZoomEventHandler()
     this.setupDrawingEventHandler()
-
-    this.totalPages = pages.length
-
-    // Zoom out - fit width
-    this.canvas.setZoom(this.boundary.zoomOut)
-
-    // Center page with viewport
-    for (const page of pages) {
-      this.canvas.viewportCenterObjectH(page)
-    }
-    // this.canvas.viewportCenterObject(pages[0])
+    return pages
   }
 
   setupPanAndZoomEventHandler () {
@@ -184,13 +229,11 @@ export class MobileCanvasController implements PDFCanvasController {
 
   dragPan (p: TouchPoint) {
     const { x, y } = p
-    const vpt = this.canvas.viewportTransform
-    if (vpt) {
-      vpt[4] = vpt[4] + (x - this.dragging.lastPosX)
-      vpt[5] = vpt[5] + (y - this.dragging.lastPosY)
-    }
-
-    const reach = this.moveViewportIntoBoundary()
+    const canvasVtp = [...(this.canvas.viewportTransform || [])]
+    canvasVtp[4] = canvasVtp[4] + (x - this.dragging.lastPosX)
+    canvasVtp[5] = canvasVtp[5] + (y - this.dragging.lastPosY)
+    const { reach, vpt } = this.moveViewportIntoBoundary(canvasVtp)
+    this.canvas.setViewportTransform(vpt)
     this.canvas.requestRenderAll()
     this.updateCurrentPage()
     this.dragging.lastPosX = x
@@ -220,37 +263,88 @@ export class MobileCanvasController implements PDFCanvasController {
       }
 
       this.canvas.zoomToPoint(new fabric.Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2), zoom)
+      this.centerViewport()
     }
 
     this.pinching.lastDistance = distance
   }
 
-  setupCanvasDimensions (pages?: fabric.Object[]) {
+  setupCanvasDimensions () {
     const wrapper = this.canvas.getElement().parentElement?.parentElement
     if (!wrapper) {
       throw new Error("Can't find canvas wrapper")
     }
+
     const width = Number(wrapper.getAttribute('data-width')) || wrapper.offsetWidth
     this.canvas.setWidth(width - 2)
+    const height = Number(wrapper.getAttribute('data-height'))
+    this.canvas.setHeight(height)
 
-    const userHeight = wrapper.getAttribute('data-height')
-    if (userHeight) {
-      this.canvas.setHeight(userHeight)
-    } else if (pages && pages[0]) {
-      const ratio = pages[0].getScaledHeight() / pages[0].getScaledWidth()
-      this.canvas.setHeight(wrapper.offsetWidth * ratio)
-    } else {
-      this.canvas.setHeight(wrapper.offsetWidth * Math.SQRT2)
-    }
+    // Setup background color
     this.canvas.setBackgroundColor('#eeeeee', () => { /**/ })
   }
 
-  setupPanAndZoomBoundary (pages: fabric.Object[]) {
+  setupZoomOutBoundary (pages: fabric.Object[]) {
+    const scaleX = this.canvas.getWidth() / pages[0].getScaledWidth()
+    const scaleY = this.canvas.getHeight() / pages[0].getScaledHeight()
+    const zoom = _.min([scaleX, scaleY]) as number
+    this.canvas.setZoom(zoom)
+
+    if (this.pages.length > 1) {
+      this.boundary.zoomOut = zoom / 2
+    } else {
+      this.boundary.zoomOut = zoom
+    }
+  }
+
+  setupPanBoundary (pages: fabric.Object[]) {
+    const pageScaledHeight = pages[0].getScaledHeight()
+    const pageScaledWidth = pages[0].getScaledWidth()
+
     this.boundary.top = 0
     this.boundary.left = 0
-    this.boundary.right = pages[0].getScaledWidth()
-    this.boundary.bottom = (pages[0].getScaledHeight() * 1.02) * pages.length + 100
-    this.boundary.zoomOut = (this.canvas.getWidth() / pages[0].getScaledWidth())
+    this.boundary.right = pageScaledWidth
+    this.boundary.bottom = pageScaledHeight * pages.length + (PDF_PAGE_SPACE * pageScaledHeight * (pages.length - 1))
+    this.hardBoundary = { ...this.boundary }
+  }
+
+  centerViewport () {
+    const page = this.pages[0]
+    const zoom = this.canvas.getZoom()
+
+    const canvasScaledWidth = this.canvas.getWidth() * (1 / zoom)
+    const canvasScaledHeight = this.canvas.getHeight() * (1 / zoom)
+    const pageScaledWidth = page.getScaledWidth()
+    const pageScaledHeight = page.getScaledHeight()
+
+    if (canvasScaledWidth > pageScaledWidth) {
+      const x = ((canvasScaledWidth - pageScaledWidth) / 2)
+      const vpt = this.canvas.viewportTransform
+      if (vpt) {
+        vpt[4] = x * zoom
+        this.canvas.setViewportTransform(vpt)
+      }
+    }
+
+    if (pageScaledWidth > canvasScaledWidth) {
+      const vpt = [...this.canvas.viewportTransform || []]
+      this.canvas.setViewportTransform(this.moveViewportIntoBoundary(vpt).vpt)
+    }
+
+    const totalPageScaledHeight = pageScaledHeight * this.pages.length
+    if (canvasScaledHeight > totalPageScaledHeight) {
+      const y = ((canvasScaledHeight - totalPageScaledHeight) / 2)
+      const vpt = this.canvas.viewportTransform
+      if (vpt) {
+        vpt[5] = y * zoom
+        this.canvas.setViewportTransform(vpt)
+      }
+    }
+
+    if (pageScaledHeight > canvasScaledHeight) {
+      const vpt = [...this.canvas.viewportTransform || []]
+      this.canvas.setViewportTransform(this.moveViewportIntoBoundary(vpt).vpt)
+    }
   }
 
   async drawPDFPages (pdfUrl: string): Promise<fabric.Image[]> {
@@ -344,11 +438,12 @@ export class MobileCanvasController implements PDFCanvasController {
       throw new Error('`this.canvas` is not initialized')
     }
 
-    let zoom = this.canvas.getZoom() + 0.1
-    if (zoom > this.boundary.zoomIn) {
-      zoom = this.boundary.zoomIn
+    let zoom = this.canvas.getZoom() * (6 / 5)
+    if (zoom > this.hardBoundary.zoomIn) {
+      zoom = this.hardBoundary.zoomIn
     }
     this.canvas.setZoom(zoom)
+    this.centerViewport()
   }
 
   zoomOut () {
@@ -356,59 +451,65 @@ export class MobileCanvasController implements PDFCanvasController {
       throw new Error('`this.canvas` is not initialized')
     }
 
-    let zoom = this.canvas.getZoom() - 0.1
-    if (zoom < this.boundary.zoomOut) {
-      zoom = this.boundary.zoomOut
+    let zoom = this.canvas.getZoom() * (5 / 6)
+    if (zoom < this.hardBoundary.zoomOut) {
+      zoom = this.hardBoundary.zoomOut
     }
     this.canvas.setZoom(zoom)
-
-    this.moveViewportIntoBoundary()
+    this.centerViewport()
   }
 
-  moveViewportIntoBoundary () {
-    const vpt = this.canvas.viewportTransform
+  moveViewportIntoBoundary (vpt: number[]) {
     const reach = {
       top: false,
       left: false,
       right: false,
       bottom: false
     }
-    if (vpt) {
-      const zoom = this.canvas.getZoom()
-      const tl = { x: -vpt[4] / zoom, y: -vpt[5] / zoom }
-      const br = { x: (this.canvas.getWidth() - vpt[4]) / zoom, y: (this.canvas.getHeight() - vpt[5]) / zoom }
 
+    const zoom = this.canvas.getZoom()
+    const canvasScaledWidth = this.canvas.getWidth() * (1 / zoom)
+    const canvasScaledHeight = this.canvas.getHeight() * (1 / zoom)
+    const pageScaledWidth = this.pages[0].getScaledWidth()
+    const pageScaledHeight = this.pages[0].getScaledHeight()
+    const currentVpt = this.canvas.viewportTransform as number[]
+    const tl = { x: -vpt[4] / zoom, y: -vpt[5] / zoom }
+    const br = { x: (this.canvas.getWidth() - vpt[4]) / zoom, y: (this.canvas.getHeight() - vpt[5]) / zoom }
+
+    const isPageFillHorizontalSpace = Math.round(canvasScaledWidth) <= Math.round(pageScaledWidth)
+    const isPageFillVertialSpace = Math.round(canvasScaledHeight) <= Math.round(pageScaledHeight)
+    const lockViewportY = isPageFillHorizontalSpace && canvasScaledHeight > pageScaledHeight * this.pages.length
+    const lockViewportX = isPageFillVertialSpace && canvasScaledWidth > pageScaledWidth && !lockViewportY
+
+    if (lockViewportX) {
+      vpt[4] = currentVpt[4]
+    } else {
       if (tl.x < this.boundary.left) {
         vpt[4] = -this.boundary.left * zoom
-      }
-      if (br.x > this.boundary.right) {
+        reach.left = true
+      } else if (br.x > this.boundary.right) {
         vpt[4] = this.canvas.getWidth() - (this.boundary.right * zoom)
+        reach.right = true
       }
+    }
 
+    if (lockViewportY) {
+      vpt[5] = currentVpt[5]
+    } else {
       if (tl.y < this.boundary.top) {
         vpt[5] = -this.boundary.top * zoom
         reach.top = true
-      }
-      if (br.y > this.boundary.bottom) {
+      } else if (br.y > this.boundary.bottom) {
         vpt[5] = this.canvas.getHeight() - (this.boundary.bottom * zoom)
         reach.bottom = true
       }
     }
 
-    return reach
+    return {
+      vpt: vpt,
+      reach: reach
+    }
   }
-
-  // getViewportTLBR () {
-  //   const vpt = this.canvas.viewportTransform
-  //   if (!vpt) {
-  //     throw new Error('no viewport')
-  //   }
-
-  //   const zoom = this.canvas.getZoom()
-  //   const tl = { x: -vpt[4] / zoom, y: -vpt[5] / zoom }
-  //   const br = { x: (this.canvas.getWidth() - vpt[4]) / zoom, y: (this.canvas.getHeight() - vpt[5]) / zoom }
-  //   return { tl, br }
-  // }
 
   addSignature (signature: fabric.Group) {
     if (!this.canvas) {
@@ -433,10 +534,11 @@ export class MobileCanvasController implements PDFCanvasController {
   }
 
   resizeCanvas () {
-    const pages = this.canvas.getObjects().filter((x) => _.get(x, 'attrs.type') === 'pdf-page')
-    this.setupCanvasDimensions(pages)
-    this.setupPanAndZoomBoundary(pages)
-    this.canvas.setZoom(this.boundary.zoomOut)
+    const pages = this.pages
+    this.setupCanvasDimensions()
+    this.setupZoomOutBoundary(pages)
+    this.setupPanBoundary(pages)
+    this.centerViewport()
   }
 
   goToPage (pageNum: number) {
@@ -474,9 +576,29 @@ export class MobileCanvasController implements PDFCanvasController {
   }
 
   async exportPNG (): Promise<Blob> {
+    // reset zoom ratio for exporting
+    this.setupZoomOutBoundary(this.pages)
+
+    // resize canvas to fit image
+    const img = this.pages[0]
+    const zoom = this.canvas.getZoom()
+    this.canvas.setWidth(img.getScaledWidth() * zoom)
+    this.canvas.setHeight(img.getScaledHeight() * zoom)
+
+    // Move viewport to fit the whole image
+    const vpt = [...(this.canvas.viewportTransform || [])]
+    vpt[4] = 0
+    vpt[5] = 0
+    this.canvas.setViewportTransform(vpt)
+
+    // Export data as blob
     const dataURL = this.canvas.toDataURL({ format: 'png' })
     const res = await fetch(dataURL)
     const blob = await res.blob()
+
+    // Reset canvas back to normal
+    this.resizeCanvas()
+
     return blob
   }
 

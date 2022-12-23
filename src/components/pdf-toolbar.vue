@@ -122,7 +122,7 @@ export default Vue.extend({
   display: flex;
   justify-content: space-between;
   flex-direction: row;
-  flex-wrap: nowrap;
+  /* flex-wrap: nowrap; */
   background: #e0e0e0;
   border-top: 2px solid #e0e0e0;
   border-bottom: 2px solid #e0e0e0;

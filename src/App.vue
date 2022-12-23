@@ -1,21 +1,35 @@
 <template>
   <div id="app">
-    <div class="meta">
+    <!-- <div class="meta">
       window.innerWidth = {{ window.innerWidth }}<br>
       window.innerHeight = {{ window.innerHeight }}<br>
-    </div>
+    </div> -->
 
-    <pdf-signer :key="src" pdf-url="https://docs.google.com/document/d/1uCUmohUoPD35AdwpjJs7NQ4q8NLvjzKxxVBrLyAyALk/export?format=pdf" ref="pdf" width="1200px" style="border: 1px solid #d0d0d0;" />
+    <x-dialog v-model="loading">
+      <template #header>
+        <h1 style="padding: 10px;">Loading Document</h1>
+      </template>
+      <div>Please wait ...</div>
+    </x-dialog>
+
+    <pdf-signer
+      :key="src"
+      ref="pdf"
+      :src="src"
+      style="border: 1px solid #d0d0d0; width: 100%; height: calc(100vh - 100px);"
+      @ready="loading = false"
+    />
 
     <div>External Control</div>
     <button @click="exportPDF()">Export PDF</button>
     <button @click="exportPNG()">Export PNG</button>
-    <button @click="togglePdfImage()">Toggle PDF / Image</button>
+    <button @click="changeSrc()">Change File</button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import XDialog from './components/common/x-dialog.vue'
 import PdfSigner from './components/pdf-signer.vue'
 import { PDFCanvasController } from './lib/pdf-canvas'
 import { downloadURL, openURL } from './utils/window'
@@ -23,12 +37,30 @@ import { downloadURL, openURL } from './utils/window'
 export default Vue.extend({
   name: 'App',
   components: {
-    PdfSigner
+    PdfSigner,
+    XDialog
   },
   data () {
     return {
-      src: '/example.jpg'
+      src: '/img-sample-1.jpg',
+      srcindex: 0,
+      srcset: [
+        '/pdf-sample-1.pdf',
+        '/pdf-sample-2.pdf',
+        '/pdf-sample-3.pdf',
+        '/img-sample-1.jpg',
+        '/img-sample-2.jpg'
+      ],
+      loading: true,
+      width: '',
+      height: ''
     }
+  },
+  mounted () {
+    window.addEventListener('resize', () => {
+      this.width = (window.innerWidth - 16) + 'px'
+      this.height = (window.innerHeight - 16) + 'px'
+    })
   },
   computed: {
     window () {
@@ -51,12 +83,9 @@ export default Vue.extend({
       downloadURL(url)
     },
 
-    togglePdfImage () {
-      if (this.src === '/example.pdf') {
-        this.src = '/example.jpg'
-      } else {
-        this.src = '/example.pdf'
-      }
+    changeSrc () {
+      this.srcindex = (this.srcindex += 1) % this.srcset.length
+      this.src = this.srcset[this.srcindex]
     }
   }
 })
@@ -69,8 +98,10 @@ export default Vue.extend({
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
-  max-width: 1202px;
-  margin: auto;
+  margin: 0;
+  padding: 0;
+  /* margin-top: 60px; */
+  /* max-width: 1202px; */
+  /* margin: auto; */
 }
 </style>

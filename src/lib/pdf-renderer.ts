@@ -15,7 +15,7 @@ export class PDFController {
   private static renderPDFPageToCanvas (page: PDFPageProxy): Promise<HTMLCanvasElement> {
     return new Promise((resolve) => {
       // Retina scaling
-      const viewport = page.getViewport({ scale: window.devicePixelRatio * 2 })
+      const viewport = page.getViewport({ scale: window.devicePixelRatio * 1.5 })
 
       // Prepare canvas using PDF page dimensions
       const pageCanvas = document.createElement('canvas')

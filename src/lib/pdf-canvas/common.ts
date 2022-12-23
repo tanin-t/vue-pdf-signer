@@ -1,6 +1,6 @@
 import { PDFController } from '../pdf-renderer'
 
-const PDF_PAGE_SPACE = 0.05 // 5% of page height
+export const PDF_PAGE_SPACE = 0.05 // 5% of page height
 
 export async function renderPDF (src: string) {
   const fabricImages = await PDFController.renderPDFPagesAsFabricImages(src)
