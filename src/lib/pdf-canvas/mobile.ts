@@ -255,10 +255,10 @@ export class MobileCanvasController implements PDFCanvasController {
       const delta = distance - this.pinching.lastDistance
       let zoom = this.canvas.getZoom()
       zoom *= 0.999 ** (-4 * delta)
-      if (zoom > this.boundary.zoomIn) {
+      if (zoom > this.hardBoundary.zoomIn) {
         zoom = this.boundary.zoomIn
       }
-      if (zoom < this.boundary.zoomOut) {
+      if (zoom < this.hardBoundary.zoomOut) {
         zoom = this.boundary.zoomOut
       }
 
@@ -478,8 +478,13 @@ export class MobileCanvasController implements PDFCanvasController {
 
     const isPageFillHorizontalSpace = Math.round(canvasScaledWidth) <= Math.round(pageScaledWidth)
     const isPageFillVertialSpace = Math.round(canvasScaledHeight) <= Math.round(pageScaledHeight)
-    const lockViewportY = isPageFillHorizontalSpace && canvasScaledHeight > pageScaledHeight * this.pages.length
-    const lockViewportX = isPageFillVertialSpace && canvasScaledWidth > pageScaledWidth && !lockViewportY
+    let lockViewportY = isPageFillHorizontalSpace && canvasScaledHeight > pageScaledHeight * this.pages.length
+    let lockViewportX = isPageFillVertialSpace && canvasScaledWidth > pageScaledWidth && !lockViewportY
+
+    if (!isPageFillHorizontalSpace && !isPageFillVertialSpace && this.pages.length > 1) {
+      lockViewportX = true
+      lockViewportY = false
+    }
 
     if (lockViewportX) {
       vpt[4] = currentVpt[4]

@@ -42,7 +42,7 @@ export default Vue.extend({
   },
   data () {
     return {
-      src: '/img-sample-1.jpg',
+      src: '/pdf-sample-1.jpg',
       srcindex: 0,
       srcset: [
         '/pdf-sample-1.pdf',
