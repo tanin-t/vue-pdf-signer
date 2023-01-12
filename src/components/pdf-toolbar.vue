@@ -22,7 +22,8 @@
       <!-- Right -->
       <div style="padding-right: 4px;">
         <span style="font-size: 32px; width: 0;">&nbsp;</span>
-        <x-button :icon="icons.sign" text="Add Signature" @click="$emit('click-sign')" />
+        <x-button :icon="icons.textBox" text="Text Box" @click="$emit('click-textbox')" />
+        <x-button :icon="icons.sign" text="Signature" @click="$emit('click-sign')" />
         <x-button :icon="icons.drawPen" text="Draw" :class="{'active': isDrawing}" @click="$emit('click-draw')" />
         <x-button :icon="icons.imagePlus" text="Image" @click="$emit('click-insert-image')" />
         <x-button :icon="icons.export" @click="$emit('click-export')" />
@@ -54,7 +55,8 @@ import {
   mdiSignatureFreehand,
   mdiFormatListBulletedSquare,
   mdiDrawPen,
-  mdiImagePlus
+  mdiImagePlus,
+  mdiTextBox
 } from '@mdi/js'
 import { isMobile } from '@/utils/device'
 import PdfDrawingToolbar from './pdf-drawing-toolbar.vue'
@@ -105,7 +107,8 @@ export default Vue.extend({
         export: mdiDownload,
         pages: mdiFormatListBulletedSquare,
         drawPen: mdiDrawPen,
-        imagePlus: mdiImagePlus
+        imagePlus: mdiImagePlus,
+        textBox: mdiTextBox
       }
     }
   }

@@ -21,6 +21,7 @@ export interface PDFCanvasController {
   setDrawingMode (enable: boolean): void
   setDrawingTool (tool: 'pen'|'eraser'): void
   insertImage (file: File, opacity?: number, insertToAllPages?: boolean): void
+  insertTextBox (): void
 }
 
 export async function setupCanvas (canvasId: string, src: string, srcType: 'image'|'pdf'): Promise<PDFCanvasController> {
@@ -38,6 +39,22 @@ export async function setupCanvas (canvasId: string, src: string, srcType: 'imag
 
 function setupObjectControls () {
   fabric.Object.prototype.controls.deleteControl = new fabric.Control({
+    x: 0.5,
+    y: -0.5,
+    offsetY: -16,
+    offsetX: 16,
+    cursorStyle: 'pointer',
+    mouseUpHandler: (ev, transform) => {
+      const target = transform.target
+      const canvas = target.canvas
+      canvas?.remove(target)
+      canvas?.requestRenderAll()
+      return true
+    },
+    render: renderIcon(createDeleteImg())
+  })
+
+  fabric.Textbox.prototype.controls.deleteControl = new fabric.Control({
     x: 0.5,
     y: -0.5,
     offsetY: -16,

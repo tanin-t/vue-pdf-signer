@@ -666,4 +666,13 @@ export class MobileCanvasController implements PDFCanvasController {
       })
     }
   }
+
+  insertTextBox () {
+    const textbox = new fabric.Textbox('Textbox\nEnter you text here!', { width: 400 });
+    (textbox as never as FabricObject).attrs = { type: 'textbox' }
+    textbox.scaleToWidth(500)
+    this.canvas.add(textbox)
+    this.canvas.setActiveObject(textbox)
+    this.canvas.viewportCenterObject(textbox)
+  }
 }

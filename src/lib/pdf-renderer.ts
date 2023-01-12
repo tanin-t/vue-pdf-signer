@@ -9,6 +9,7 @@ interface PageAnnotations {
   page: fabric.Object
   signatures: fabric.Object[]
   images: fabric.Object[]
+  textboxes: fabric.Object[]
 }
 
 export class PDFController {
@@ -78,6 +79,7 @@ export class PDFController {
       const fabricPage = annotationGroup[i].page
       const pageSignatures = annotationGroup[i].signatures
       const pageImages = annotationGroup[i].images
+      const pageTextBoxes = annotationGroup[i].textboxes
 
       const tr = new PDFDimensionTransformer(fabricPage as fabric.Image, pdfPage)
       for (const sig of pageSignatures) {
@@ -107,6 +109,20 @@ export class PDFController {
           }
         )
       }
+
+      for (const textbox of pageTextBoxes) {
+        const pdfImage = await this.getPDFImage(pdfDoc, textbox.toDataURL({}))
+        const coords = tr.getPDFCoords(textbox)
+        pdfPage.drawImage(
+          pdfImage,
+          {
+            x: coords.x,
+            y: coords.y - tr.getPDFLength(pdfImage.height),
+            width: tr.getPDFLength(pdfImage.width),
+            height: tr.getPDFLength(pdfImage.height)
+          }
+        )
+      }
     }
 
     return pdfDoc
@@ -117,6 +133,7 @@ export class PDFController {
     const pages = objs.filter(x => _.get(x, 'attrs.type') === 'pdf-page')
     const signatures = objs.filter(x => _.get(x, 'attrs.type') === 'signature')
     const images = objs.filter(x => _.get(x, 'attrs.type') === 'image')
+    const textboxes = objs.filter(x => _.get(x, 'attrs.type') === 'textbox')
 
     const results = []
     for (const i in pages) {
@@ -126,7 +143,8 @@ export class PDFController {
         page_num: i,
         page: page,
         signatures: signatures.filter(s => s.isContainedWithinObject(page, true)),
-        images: images
+        images: images.filter(x => x.isContainedWithinObject(page, true)),
+        textboxes: textboxes.filter(x => x.isContainedWithinObject(page, true))
       })
     }
 

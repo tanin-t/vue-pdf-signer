@@ -1,7 +1,7 @@
 
 export interface FabricObject extends fabric.Object {
   attrs: {
-    type: 'signature'|'pdf-page'|'drawing'|'image'
+    type: 'signature'|'pdf-page'|'drawing'|'image'|'textbox'
   }
 }
 

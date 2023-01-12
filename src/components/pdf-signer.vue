@@ -16,6 +16,7 @@
         @click-export="exportData()"
         @click-draw="toggleDrawingMode()"
         @click-insert-image="insertImageDialog = true"
+        @click-textbox="insertTextBox()"
         :page="controller.currentPage"
         @update:page="changePage($event)"
         :is-drawing="drawing.enable"
@@ -236,6 +237,13 @@ export default Vue.extend({
         throw new Error('controller is not initialized')
       }
       this.controller.insertImage(evt.file, evt.opacity, evt.insertToAllPages)
+    },
+
+    insertTextBox () {
+      if (!this.controller) {
+        throw new Error('controller is not initialized')
+      }
+      this.controller.insertTextBox()
     },
 
     onCanvasKeydown (e: KeyboardEvent) {
