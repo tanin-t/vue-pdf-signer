@@ -71,6 +71,7 @@ export default Vue.extend({
         isDrawingMode: true
       })
       this.canvas.freeDrawingBrush.width = 3
+      this.canvas.freeDrawingBrush.color = '#0074C8'
     },
 
     clear () {
