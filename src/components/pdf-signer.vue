@@ -227,7 +227,6 @@ export default Vue.extend({
     },
 
     updateDrawingTool (tool: 'pen'|'eraser') {
-      console.log('updateDrawingTool', { tool })
       this.drawing.tool = tool
       this.controller?.setDrawingTool(tool)
     },
