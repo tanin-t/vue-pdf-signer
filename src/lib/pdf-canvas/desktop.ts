@@ -53,6 +53,11 @@ export class DesktopCanvasController extends MobileCanvasController {
       if (!this.dragging.isDragging) {
         return
       }
+
+      if (this.drawing.tool === 'eraser') {
+        return
+      }
+
       this.dragPan(opt.pointer)
     })
 
