@@ -128,6 +128,16 @@ export class PDFController {
     return pdfDoc
   }
 
+  static isPartiallyContain (pageObj: fabric.Object, annotateObj: fabric.Object): boolean {
+    if (!annotateObj.aCoords) {
+      throw new Error('`anntotateObj` does not have aCoords')
+    }
+
+    return Object.values(annotateObj.aCoords).some(point => {
+      return pageObj.containsPoint(point, undefined, true)
+    })
+  }
+
   static getAnnotationsGroupByPage (canvas: fabric.Canvas): PageAnnotations[] {
     const objs = canvas.getObjects() as FabricObject[]
     const pages = objs.filter(x => _.get(x, 'attrs.type') === 'pdf-page')
@@ -142,11 +152,20 @@ export class PDFController {
       results.push({
         page_num: i,
         page: page,
-        signatures: signatures.filter(s => s.isContainedWithinObject(page, true)),
-        images: images.filter(x => x.isContainedWithinObject(page, true)),
-        textboxes: textboxes.filter(x => x.isContainedWithinObject(page, true))
+        signatures: signatures.filter(x => this.isPartiallyContain(page, x)),
+        images: images.filter(x => this.isPartiallyContain(page, x)),
+        textboxes: textboxes.filter(x => this.isPartiallyContain(page, x))
       })
     }
+
+    // oCoords
+    // Describe object's corner position in canvas element coordinates.
+    // properties are depending on control keys and padding the main controls. each property is an object with x, y and corner.
+    // The `corner` property contains in a similar manner the 4 points of the interactive area of the corner.
+    // The coordinates depends from the controls positionHandler and are used to draw and locate controls
+
+    // containsPoint
+    // http://fabricjs.com/docs/fabric.Object.html#containsPoint
 
     return results
   }
