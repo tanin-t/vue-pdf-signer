@@ -618,7 +618,7 @@ export class MobileCanvasController implements PDFCanvasController {
     }
   }
 
-  setDrawingTool (tool: 'pen' | 'eraser'): void {
+  setDrawingTool (tool: 'pen' | 'highlighter' | 'eraser'): void {
     this.drawing.tool = tool
 
     if (this.drawing.tool === 'pen') {

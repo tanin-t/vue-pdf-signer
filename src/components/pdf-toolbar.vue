@@ -36,9 +36,9 @@
         :pen-size="drawingPen.size"
         :pen-color="drawingPen.color"
         :tool="drawingTool"
-        @update:pen-size="$emit('update:drawing-pen', { ...drawingPen, size: $event })"
-        @update:pen-color="$emit('update:drawing-pen', { ...drawingPen, color: $event })"
-        @update:tool="$emit('update:drawing-tool', $event)"
+        @update:pen-size="updateDrawingPen({ size: $event })"
+        @update:pen-color="updateDrawingPen({ color: $event })"
+        @update:tool="updateTool($event)"
         @click-close="$emit('click-draw')"
       />
     </div>
@@ -61,6 +61,17 @@ import {
 import { isMobile } from '@/utils/device'
 import PdfDrawingToolbar from './pdf-drawing-toolbar.vue'
 import xButton from './common/x-button.vue'
+
+const defaultTools = {
+  'vue-pdf-signer:tool:pen': {
+    size: 3,
+    color: 'rgba(0,0,0,1)'
+  },
+  'vue-pdf-signer:tool:highlighter': {
+    size: 15, color: 'rgba(252,186,3,0.5)'
+  },
+  'vue-pdf-signer:tool:eraser': null
+}
 
 export default Vue.extend({
   components: {
@@ -111,6 +122,29 @@ export default Vue.extend({
         textBox: mdiTextBox
       }
     }
+  },
+
+  methods: {
+    updateDrawingPen (data: { size?: number, color?: string}) {
+      const drawingPen = { ...this.drawingPen, ...data }
+      this.$emit('update:drawing-pen', drawingPen)
+
+      localStorage.setItem(`vue-pdf-signer:tool:${this.drawingTool}`, JSON.stringify(drawingPen))
+    },
+
+    updateTool (tool:'pen'|'highlighter'|'eraser') {
+      const key = `vue-pdf-signer:tool:${tool}`
+      const savedTool = localStorage.getItem(key)
+      const toolConfig = savedTool ? JSON.parse(savedTool) : defaultTools[key as keyof typeof defaultTools]
+
+      if (toolConfig) {
+        this.$emit('update:drawing-tool', tool)
+        this.$emit('update:drawing-pen', toolConfig)
+      } else {
+        this.$emit('update:drawing-tool', tool)
+      }
+    }
+
   }
 })
 </script>

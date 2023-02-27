@@ -75,7 +75,7 @@ export default Vue.extend({
         tool: 'pen',
         pen: {
           size: 1,
-          color: 'black'
+          color: 'rgba(0,0,0,1)'
         },
         enable: false
       },
@@ -208,7 +208,7 @@ export default Vue.extend({
     startDrawing () {
       this.drawing.enable = true
       this.controller?.setDrawingMode(true)
-      this.updateDrawingPen({ size: 3, color: 'black' })
+      this.updateDrawingPen({ size: 3, color: 'rgba(0,0,0,1)' })
       this.updateDrawingTool('pen')
     },
 
@@ -226,9 +226,14 @@ export default Vue.extend({
       this.controller.canvas.freeDrawingBrush.color = pen.color
     },
 
-    updateDrawingTool (tool: 'pen'|'eraser') {
+    updateDrawingTool (tool: 'pen'|'highlighter'|'eraser') {
       this.drawing.tool = tool
-      this.controller?.setDrawingTool(tool)
+
+      if (['pen', 'highlighter'].includes(tool)) {
+        this.controller?.setDrawingTool('pen')
+      } else {
+        this.controller?.setDrawingTool('eraser')
+      }
     },
 
     insertImage (evt: any) {

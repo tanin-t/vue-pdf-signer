@@ -9,6 +9,12 @@
       />
       <x-button
         class="square"
+        :icon="icons.marker"
+        :class="{'active': tool === 'highlighter'}"
+        @click="$emit('update:tool', 'highlighter')"
+      />
+      <x-button
+        class="square"
         :icon="icons.eraser"
         :class="{'active': tool === 'eraser'}"
         @click="$emit('update:tool', 'eraser')"
@@ -18,7 +24,7 @@
       <input
         type="range"
         min="1"
-        max="10"
+        max="30"
         :value="penSize"
         @input="$emit('update:pen-size', Number($event.target.value))"
         style="width: 100px;"
@@ -26,13 +32,13 @@
 
       <label style="margin-left: 12px">Color</label>
       <x-button
-        v-for="c in ['black', 'red', 'blue']"
+        v-for="c in ['rgba(0,0,0,1)', 'rgba(255,0,0,1)', 'rgba(0,116,200,1)', 'rgba(252,186,3,1)', 'rgba(255,192,203,1)', 'rgba(5,194,2,1)']"
         :key="c"
         :icon="icons.circle"
         :color="c"
         class="square"
-        :class="{'active': penColor === c}"
-        @click="$emit('update:pen-color', c)"
+        :class="{'active': isActivePenColor(c)}"
+        @click="updatePenColor(c)"
       />
     </div>
     <div style="text-align: right">
@@ -48,7 +54,9 @@
 <script lang="ts">
 import Vue, { PropOptions } from 'vue'
 import xButton from './common/x-button.vue'
-import { mdiCircle, mdiClose, mdiDrawPen, mdiPen, mdiEraser } from '@mdi/js'
+import { mdiCircle, mdiClose, mdiDrawPen, mdiPen, mdiEraser, mdiMarker } from '@mdi/js'
+import { updateRgbaAlpha } from '@/utils/color'
+
 export default Vue.extend({
 
   components: { xButton },
@@ -75,8 +83,25 @@ export default Vue.extend({
         circle: mdiCircle,
         drawPen: mdiDrawPen,
         pen: mdiPen,
-        eraser: mdiEraser
+        eraser: mdiEraser,
+        marker: mdiMarker
       }
+    }
+  },
+
+  methods: {
+    updatePenColor (color: string) {
+      if (this.tool === 'pen') {
+        this.$emit('update:pen-color', color)
+      }
+
+      if (this.tool === 'highlighter') {
+        this.$emit('update:pen-color', updateRgbaAlpha(color, 0.5))
+      }
+    },
+
+    isActivePenColor (color: string) {
+      return updateRgbaAlpha(this.penColor, 1) === color
     }
   }
 })
