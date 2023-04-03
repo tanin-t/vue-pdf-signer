@@ -32,7 +32,7 @@
 
       <label style="margin-left: 12px">Color</label>
       <x-button
-        v-for="c in ['rgba(0,0,0,1)', 'rgba(255,0,0,1)', 'rgba(0,116,200,1)', 'rgba(252,186,3,1)', 'rgba(255,192,203,1)', 'rgba(5,194,2,1)']"
+        v-for="c in ['rgba(0,0,0,1)', 'rgba(255,0,0,1)', 'rgba(0,0,255,1)', 'rgba(252,186,3,1)', 'rgba(255,192,203,1)', 'rgba(5,194,2,1)']"
         :key="c"
         :icon="icons.circle"
         :color="c"
