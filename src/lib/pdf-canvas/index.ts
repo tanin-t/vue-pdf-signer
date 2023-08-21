@@ -2,6 +2,7 @@ import { isMobile } from '@/utils/device'
 import { fabric } from 'fabric'
 import { DesktopCanvasController } from './desktop'
 import { MobileCanvasController } from './mobile'
+import { ITextboxOptions } from 'fabric/fabric-impl'
 
 export interface PDFCanvasController {
   canvas: fabric.Canvas
@@ -22,6 +23,7 @@ export interface PDFCanvasController {
   setDrawingTool (tool: 'pen'|'eraser'): void
   insertImage (file: File, opacity?: number, insertToAllPages?: boolean): void
   insertTextBox (): void
+  insertText(text: string, options: ITextboxOptions, isRight: boolean): void
 }
 
 export async function setupCanvas (canvasId: string, src: string, srcType: 'image'|'pdf'): Promise<PDFCanvasController> {

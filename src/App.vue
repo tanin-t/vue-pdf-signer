@@ -24,6 +24,7 @@
     <button @click="exportPDF()">Export PDF</button>
     <button @click="exportPNG()">Export PNG</button>
     <button @click="changeSrc()">Change File</button>
+    <button @click="addText()">Add Text</button>
   </div>
 </template>
 
@@ -86,6 +87,12 @@ export default Vue.extend({
     changeSrc () {
       this.srcindex = (this.srcindex += 1) % this.srcset.length
       this.src = this.srcset[this.srcindex]
+    },
+
+    addText () {
+      const controller = (this.$refs.pdf as any).controller as PDFCanvasController
+      const options = { fontSize: 38, fontWeight: 'normal', left: 200, top: 200 }
+      controller.insertText('test', options, true)
     }
   }
 })

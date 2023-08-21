@@ -5,6 +5,7 @@ import { PDF_PAGE_SPACE, renderPDF } from './common'
 import _ from 'lodash'
 import { PDFController } from '../pdf-renderer'
 import { getFileExtension } from '@/utils'
+import { ITextboxOptions } from 'fabric/fabric-impl'
 
 interface TouchPoint {
   x: number
@@ -674,5 +675,23 @@ export class MobileCanvasController implements PDFCanvasController {
     this.canvas.add(textbox)
     this.canvas.setActiveObject(textbox)
     this.canvas.viewportCenterObject(textbox)
+  }
+
+  insertText (text: string, options: ITextboxOptions, isRight: boolean) : void {
+    const textbox = new fabric.Text(text,
+      {
+        ...options,
+        selectable: false
+      });
+    (textbox as never as FabricObject).attrs = { type: 'textbox' }
+
+    let pos = options.left
+    if (isRight && options.left && this.canvas.width && textbox.width) pos = this.canvas.width - textbox.width - options.left
+
+    textbox.set({
+      left: pos,
+      originX: 'right'
+    })
+    this.canvas.add(textbox)
   }
 }
