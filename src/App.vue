@@ -24,7 +24,10 @@
     <button @click="exportPDF()">Export PDF</button>
     <button @click="exportPNG()">Export PNG</button>
     <button @click="changeSrc()">Change File</button>
-    <button @click="addText()">Add Text</button>
+    <label>
+      <input v-model="text" type="text" name="addText" placeholder="input for Add Text button">
+      <button @click="addText()">Add Text</button>
+    </label>
   </div>
 </template>
 
@@ -54,7 +57,8 @@ export default Vue.extend({
       ],
       loading: true,
       width: '',
-      height: ''
+      height: '',
+      text: ''
     }
   },
   mounted () {
@@ -91,8 +95,8 @@ export default Vue.extend({
 
     addText () {
       const controller = (this.$refs.pdf as any).controller as PDFCanvasController
-      const options = { fontSize: 38, fontWeight: 'normal', left: 200, top: 200 }
-      controller.insertText('test', options, true)
+      const options = { fontSize: 38, fontWeight: 'normal', left: 100, top: 200, selectable: false }
+      controller.insertText(this.text, options, true)
     }
   }
 })
