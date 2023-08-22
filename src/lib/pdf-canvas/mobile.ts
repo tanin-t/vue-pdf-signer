@@ -680,18 +680,17 @@ export class MobileCanvasController implements PDFCanvasController {
   insertText (text: string, options: ITextboxOptions, isRight: boolean) : void {
     const textbox = new fabric.Text(text,
       {
-        ...options,
-        selectable: false
+        ...options
       });
     (textbox as never as FabricObject).attrs = { type: 'textbox' }
 
-    let pos = options.left
-    if (isRight && options.left && this.canvas.width && textbox.width) pos = this.canvas.width - textbox.width - options.left
-
-    textbox.set({
-      left: pos,
-      originX: 'right'
-    })
+    if (isRight && options.left) {
+      const pos = this.pages[0].getElement().width - options.left
+      textbox.set({
+        left: pos,
+        originX: 'right'
+      })
+    }
     this.canvas.add(textbox)
   }
 }
