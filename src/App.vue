@@ -96,7 +96,7 @@ export default Vue.extend({
     addText () {
       const controller = (this.$refs.pdf as any).controller as PDFCanvasController
       const options = { fontSize: 38, fontWeight: 'normal', left: 100, top: 200, selectable: false }
-      controller.insertText(this.text, options, true)
+      controller.insertText(this.text, options)
     }
   }
 })

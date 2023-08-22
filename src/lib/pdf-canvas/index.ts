@@ -23,7 +23,7 @@ export interface PDFCanvasController {
   setDrawingTool (tool: 'pen'|'eraser'): void
   insertImage (file: File, opacity?: number, insertToAllPages?: boolean): void
   insertTextBox (): void
-  insertText(text: string, options: ITextboxOptions, isRight: boolean): void
+  insertText(text: string, options: ITextboxOptions): void
 }
 
 export async function setupCanvas (canvasId: string, src: string, srcType: 'image'|'pdf'): Promise<PDFCanvasController> {
