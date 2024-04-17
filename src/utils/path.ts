@@ -8,10 +8,10 @@ export function getFileExtension (url: string) {
   // Check if the URL includes a "?" character
   if (firstQuestionMarkIndex === -1) {
     // Return the entire string starting from the last "." character
-    return url.substring(lastDotIndex + 1)
+    return url.substring(lastDotIndex + 1).toLowerCase()
   } else {
     // Extract the file extension from the URL
-    return url.substring(lastDotIndex + 1, firstQuestionMarkIndex)
+    return url.substring(lastDotIndex + 1, firstQuestionMarkIndex).toLowerCase()
   }
 }
 
