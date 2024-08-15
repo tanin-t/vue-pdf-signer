@@ -208,7 +208,7 @@ export default Vue.extend({
     startDrawing () {
       this.drawing.enable = true
       this.controller?.setDrawingMode(true)
-      this.updateDrawingPen({ size: 3, color: 'rgba(0,0,0,1)' })
+      this.updateDrawingPen({ size: 3, color: 'rgba(0,0,255,1)' })
       this.updateDrawingTool('pen')
     },
 
