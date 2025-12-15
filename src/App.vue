@@ -7,7 +7,7 @@
 
     <x-dialog v-model="loading">
       <template #header>
-        <h1 style="padding: 10px;">Loading Document</h1>
+        <h1 style="padding: 10px">Loading Document</h1>
       </template>
       <div>Please wait ...</div>
     </x-dialog>
@@ -16,7 +16,11 @@
       :key="src"
       ref="pdf"
       :src="src"
-      style="border: 1px solid #d0d0d0; width: 100%; height: calc(100vh - 100px);"
+      style="
+        border: 1px solid #d0d0d0;
+        width: 100%;
+        height: calc(100vh - 100px);
+      "
       @ready="loading = false"
     />
 
@@ -25,7 +29,12 @@
     <button @click="exportPNG()">Export PNG</button>
     <button @click="changeSrc()">Change File</button>
     <label>
-      <input v-model="text" type="text" name="addText" placeholder="input for Add Text button">
+      <input
+        v-model="text"
+        type="text"
+        name="addText"
+        placeholder="input for Add Text button"
+      />
       <button @click="addText()">Add Text</button>
     </label>
   </div>
@@ -63,8 +72,8 @@ export default Vue.extend({
   },
   mounted () {
     window.addEventListener('resize', () => {
-      this.width = (window.innerWidth - 16) + 'px'
-      this.height = (window.innerHeight - 16) + 'px'
+      this.width = window.innerWidth - 16 + 'px'
+      this.height = window.innerHeight - 16 + 'px'
     })
   },
   computed: {
@@ -74,7 +83,8 @@ export default Vue.extend({
   },
   methods: {
     async exportPDF () {
-      const controller = (this.$refs.pdf as any).controller as PDFCanvasController
+      const controller = (this.$refs.pdf as any)
+        .controller as PDFCanvasController
       const pdfBytes = await controller.exportPDF()
       const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' })
       const url = window.URL.createObjectURL(pdfBlob)
@@ -82,7 +92,8 @@ export default Vue.extend({
     },
 
     async exportPNG () {
-      const controller = (this.$refs.pdf as any).controller as PDFCanvasController
+      const controller = (this.$refs.pdf as any)
+        .controller as PDFCanvasController
       const imageBlob = await controller.exportPNG()
       const url = URL.createObjectURL(imageBlob)
       downloadURL(url)
@@ -94,8 +105,15 @@ export default Vue.extend({
     },
 
     addText () {
-      const controller = (this.$refs.pdf as any).controller as PDFCanvasController
-      const options = { fontSize: 38, fontWeight: 'normal', left: 100, top: 200, selectable: false }
+      const controller = (this.$refs.pdf as any)
+        .controller as PDFCanvasController
+      const options = {
+        fontSize: 38,
+        fontWeight: 'normal',
+        left: 100,
+        top: 200,
+        selectable: false
+      }
       controller.insertText(this.text, options)
     }
   }
