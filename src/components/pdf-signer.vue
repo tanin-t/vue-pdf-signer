@@ -26,7 +26,23 @@
         @update:drawing-tool="updateDrawingTool($event)"
         :total-pages="controller.totalPages"
       />
-      <canvas id="canvas" />
+      <div class="canvas-area">
+        <canvas id="canvas" />
+        <div
+          v-if="scrollState.hasScroll"
+          class="pdf-scrollbar"
+          ref="scrollbarTrack"
+          @mousedown="onTrackClick"
+          @touchstart.prevent="onTrackClick"
+        >
+          <div
+            class="pdf-scrollbar-thumb"
+            :style="{ top: scrollState.thumbTop + 'px', height: scrollState.thumbHeight + 'px' }"
+            @mousedown.stop="onThumbDragStart"
+            @touchstart.stop.prevent="onThumbDragStart"
+          />
+        </div>
+      </div>
     </div>
 
     <signature-dialog v-model="addSignatureDialog" @submit="insertSignature($event)"/>
@@ -80,7 +96,14 @@ export default Vue.extend({
         enable: false
       },
       width: 0,
-      height: 0
+      height: 0,
+      rafId: null as number | null,
+      dragCleanup: null as (() => void) | null,
+      scrollState: { thumbTop: 0, thumbHeight: 30, hasScroll: false } as {
+        thumbTop: number
+        thumbHeight: number
+        hasScroll: boolean
+      }
     }
   },
 
@@ -117,6 +140,7 @@ export default Vue.extend({
       this.controller = await setupCanvas('canvas', this.canvasSrc, this.srcType)
       // drawRulers(this.controller.canvas)
       this.$emit('ready')
+      this.rafId = requestAnimationFrame(this.syncScrollbar)
     })()
 
     this.resizeHandler = debounce(async () => {
@@ -134,6 +158,7 @@ export default Vue.extend({
       }
     }
   },
+
   methods: {
     insertSignature (signature: fabric.Group) {
       if (!signature) return
@@ -264,7 +289,76 @@ export default Vue.extend({
       const container = document.getElementById('pdf-container')
       this.width = container?.offsetWidth || 0
       this.height = (container?.offsetHeight || 50) - 50
+    },
+
+    syncScrollbar () {
+      if (this.controller) {
+        const { ratio, thumbRatio, hasScroll } = this.controller.getScrollInfo()
+        const canvasH = this.controller.canvas.getHeight()
+        const thumbH = Math.max(30, thumbRatio * canvasH)
+        const maxThumbTop = Math.max(0, canvasH - thumbH)
+        this.scrollState = {
+          thumbTop: ratio * maxThumbTop,
+          thumbHeight: thumbH,
+          hasScroll
+        }
+      }
+      this.rafId = requestAnimationFrame(this.syncScrollbar)
+    },
+
+    onThumbDragStart (e: MouseEvent | TouchEvent) {
+      const startClientY = e instanceof TouchEvent ? e.touches[0].clientY : (e as MouseEvent).clientY
+      const startThumbTop = this.scrollState.thumbTop
+
+      const onMove = (moveE: Event) => {
+        if (!this.controller) return
+        const clientY = moveE instanceof TouchEvent
+          ? (moveE as TouchEvent).touches[0].clientY
+          : (moveE as MouseEvent).clientY
+        const delta = clientY - startClientY
+        const canvasH = this.controller.canvas.getHeight()
+        const thumbH = this.scrollState.thumbHeight
+        const maxThumbTop = Math.max(0, canvasH - thumbH)
+        const newThumbTop = Math.max(0, Math.min(maxThumbTop, startThumbTop + delta))
+        const ratio = maxThumbTop > 0 ? newThumbTop / maxThumbTop : 0
+        this.controller.scrollToRatio(ratio)
+      }
+
+      const cleanup = () => {
+        document.removeEventListener('mousemove', onMove)
+        document.removeEventListener('mouseup', cleanup)
+        document.removeEventListener('touchmove', onMove)
+        document.removeEventListener('touchend', cleanup)
+        this.dragCleanup = null
+      }
+
+      this.dragCleanup = cleanup
+      document.addEventListener('mousemove', onMove)
+      document.addEventListener('mouseup', cleanup)
+      document.addEventListener('touchmove', onMove, { passive: true })
+      document.addEventListener('touchend', cleanup)
+    },
+
+    onTrackClick (e: MouseEvent | TouchEvent) {
+      if (!this.controller) return
+      const track = this.$refs.scrollbarTrack as HTMLElement
+      if (!track) return
+      const rect = track.getBoundingClientRect()
+      const clientY = e instanceof TouchEvent
+        ? (e as TouchEvent).touches[0].clientY
+        : (e as MouseEvent).clientY
+      const clickY = clientY - rect.top
+      const canvasH = this.controller.canvas.getHeight()
+      const thumbH = this.scrollState.thumbHeight
+      const maxThumbTop = Math.max(0, canvasH - thumbH)
+      const ratio = maxThumbTop > 0 ? Math.max(0, Math.min(1, (clickY - thumbH / 2) / maxThumbTop)) : 0
+      this.controller.scrollToRatio(ratio)
     }
+  },
+
+  beforeDestroy () {
+    if (this.rafId !== null) cancelAnimationFrame(this.rafId)
+    if (this.dragCleanup !== null) this.dragCleanup()
   }
 
 })
@@ -275,5 +369,41 @@ export default Vue.extend({
   /* border-style: none; */
   border: none;
   outline: none;
+}
+
+.canvas-area {
+  position: relative;
+}
+
+.pdf-scrollbar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.pdf-scrollbar-thumb {
+  position: absolute;
+  left: 1px;
+  width: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  cursor: grab;
+  transition: background 0.15s;
+  user-select: none;
+}
+
+.pdf-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.pdf-scrollbar-thumb:active {
+  cursor: grabbing;
+  background: rgba(0, 0, 0, 0.65);
 }
 </style>

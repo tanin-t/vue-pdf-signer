@@ -24,6 +24,8 @@ export interface PDFCanvasController {
   insertImage (file: File, opacity?: number, insertToAllPages?: boolean): void
   insertTextBox (): void
   insertText(text: string, options: ITextboxOptions): void
+  getScrollInfo (): { ratio: number; thumbRatio: number; hasScroll: boolean }
+  scrollToRatio (ratio: number): void
 }
 
 export async function setupCanvas (canvasId: string, src: string, srcType: 'image'|'pdf'): Promise<PDFCanvasController> {
