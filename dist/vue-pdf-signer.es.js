@@ -1,6 +1,6 @@
 var DS = Object.defineProperty;
 var ES = (r, t, e) => t in r ? DS(r, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : r[t] = e;
-var Ee = (r, t, e) => (ES(r, typeof t != "symbol" ? t + "" : t, e), e);
+var Ae = (r, t, e) => (ES(r, typeof t != "symbol" ? t + "" : t, e), e);
 import Sn from "vue";
 var ka = typeof globalThis != "undefined" ? globalThis : typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : {};
 function n0(r) {
@@ -49,7 +49,7 @@ zs.exports;
       ["partial", _],
       ["partialRight", F],
       ["rearg", D]
-    ], R = "[object Arguments]", H = "[object Array]", K = "[object AsyncFunction]", Q = "[object Boolean]", tt = "[object Date]", ct = "[object DOMException]", pt = "[object Error]", Ct = "[object Function]", at = "[object GeneratorFunction]", Y = "[object Map]", ht = "[object Number]", ft = "[object Null]", rt = "[object Object]", gt = "[object Promise]", Tt = "[object Proxy]", Rt = "[object RegExp]", Ft = "[object Set]", lt = "[object String]", Pt = "[object Symbol]", Vt = "[object Undefined]", Jt = "[object WeakMap]", we = "[object WeakSet]", ae = "[object ArrayBuffer]", ke = "[object DataView]", Te = "[object Float32Array]", Vr = "[object Float64Array]", ui = "[object Int8Array]", or = "[object Int16Array]", fa = "[object Int32Array]", An = "[object Uint8Array]", da = "[object Uint8ClampedArray]", va = "[object Uint16Array]", wl = "[object Uint32Array]", Qg = /\b__p \+= '';/g, $g = /\b(__p \+=) '' \+/g, tp = /(__e\(.*?\)|\b__t\)) \+\n'';/g, Jh = /&(?:amp|lt|gt|quot|#39);/g, Qh = /[&<>"']/g, ep = RegExp(Jh.source), rp = RegExp(Qh.source), ip = /<%-([\s\S]+?)%>/g, np = /<%([\s\S]+?)%>/g, $h = /<%=([\s\S]+?)%>/g, ap = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/, op = /^\w*$/, sp = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g, Sl = /[\\^$.*+?()[\]{}|]/g, lp = RegExp(Sl.source), Cl = /^\s+/, up = /\s/, hp = /\{(?:\n\/\* \[wrapped with .+\] \*\/)?\n?/, cp = /\{\n\/\* \[wrapped with (.+)\] \*/, fp = /,? & /, dp = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g, vp = /[()=,{}\[\]\/\s]/, gp = /\\(\\)?/g, pp = /\$\{([^\\}]*(?:\\.[^\\}]*)*)\}/g, tc = /\w*$/, mp = /^[-+]0x[0-9a-f]+$/i, yp = /^0b[01]+$/i, bp = /^\[object .+?Constructor\]$/, xp = /^0o[0-7]+$/i, wp = /^(?:0|[1-9]\d*)$/, Sp = /[\xc0-\xd6\xd8-\xf6\xf8-\xff\u0100-\u017f]/g, To = /($^)/, Cp = /['\n\r\u2028\u2029\\]/g, _o = "\\ud800-\\udfff", Tp = "\\u0300-\\u036f", _p = "\\ufe20-\\ufe2f", Fp = "\\u20d0-\\u20ff", ec = Tp + _p + Fp, rc = "\\u2700-\\u27bf", ic = "a-z\\xdf-\\xf6\\xf8-\\xff", Op = "\\xac\\xb1\\xd7\\xf7", Pp = "\\x00-\\x2f\\x3a-\\x40\\x5b-\\x60\\x7b-\\xbf", Ap = "\\u2000-\\u206f", kp = " \\t\\x0b\\f\\xa0\\ufeff\\n\\r\\u2028\\u2029\\u1680\\u180e\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u202f\\u205f\\u3000", nc = "A-Z\\xc0-\\xd6\\xd8-\\xde", ac = "\\ufe0e\\ufe0f", oc = Op + Pp + Ap + kp, Tl = "['’]", Dp = "[" + _o + "]", sc = "[" + oc + "]", Fo = "[" + ec + "]", lc = "\\d+", Ep = "[" + rc + "]", uc = "[" + ic + "]", hc = "[^" + _o + oc + lc + rc + ic + nc + "]", _l = "\\ud83c[\\udffb-\\udfff]", Rp = "(?:" + Fo + "|" + _l + ")", cc = "[^" + _o + "]", Fl = "(?:\\ud83c[\\udde6-\\uddff]){2}", Ol = "[\\ud800-\\udbff][\\udc00-\\udfff]", kn = "[" + nc + "]", fc = "\\u200d", dc = "(?:" + uc + "|" + hc + ")", Mp = "(?:" + kn + "|" + hc + ")", vc = "(?:" + Tl + "(?:d|ll|m|re|s|t|ve))?", gc = "(?:" + Tl + "(?:D|LL|M|RE|S|T|VE))?", pc = Rp + "?", mc = "[" + ac + "]?", Ip = "(?:" + fc + "(?:" + [cc, Fl, Ol].join("|") + ")" + mc + pc + ")*", Bp = "\\d*(?:1st|2nd|3rd|(?![123])\\dth)(?=\\b|[A-Z_])", Lp = "\\d*(?:1ST|2ND|3RD|(?![123])\\dTH)(?=\\b|[a-z_])", yc = mc + pc + Ip, jp = "(?:" + [Ep, Fl, Ol].join("|") + ")" + yc, zp = "(?:" + [cc + Fo + "?", Fo, Fl, Ol, Dp].join("|") + ")", Np = RegExp(Tl, "g"), Wp = RegExp(Fo, "g"), Pl = RegExp(_l + "(?=" + _l + ")|" + zp + yc, "g"), Up = RegExp([
+    ], R = "[object Arguments]", H = "[object Array]", K = "[object AsyncFunction]", Q = "[object Boolean]", tt = "[object Date]", ct = "[object DOMException]", pt = "[object Error]", Ct = "[object Function]", at = "[object GeneratorFunction]", Y = "[object Map]", ht = "[object Number]", ft = "[object Null]", rt = "[object Object]", gt = "[object Promise]", Tt = "[object Proxy]", Rt = "[object RegExp]", Ft = "[object Set]", lt = "[object String]", Pt = "[object Symbol]", Vt = "[object Undefined]", Jt = "[object WeakMap]", we = "[object WeakSet]", ae = "[object ArrayBuffer]", De = "[object DataView]", Te = "[object Float32Array]", Vr = "[object Float64Array]", ui = "[object Int8Array]", or = "[object Int16Array]", fa = "[object Int32Array]", An = "[object Uint8Array]", da = "[object Uint8ClampedArray]", va = "[object Uint16Array]", wl = "[object Uint32Array]", Qg = /\b__p \+= '';/g, $g = /\b(__p \+=) '' \+/g, tp = /(__e\(.*?\)|\b__t\)) \+\n'';/g, Jh = /&(?:amp|lt|gt|quot|#39);/g, Qh = /[&<>"']/g, ep = RegExp(Jh.source), rp = RegExp(Qh.source), ip = /<%-([\s\S]+?)%>/g, np = /<%([\s\S]+?)%>/g, $h = /<%=([\s\S]+?)%>/g, ap = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/, op = /^\w*$/, sp = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g, Sl = /[\\^$.*+?()[\]{}|]/g, lp = RegExp(Sl.source), Cl = /^\s+/, up = /\s/, hp = /\{(?:\n\/\* \[wrapped with .+\] \*\/)?\n?/, cp = /\{\n\/\* \[wrapped with (.+)\] \*/, fp = /,? & /, dp = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g, vp = /[()=,{}\[\]\/\s]/, gp = /\\(\\)?/g, pp = /\$\{([^\\}]*(?:\\.[^\\}]*)*)\}/g, tc = /\w*$/, mp = /^[-+]0x[0-9a-f]+$/i, yp = /^0b[01]+$/i, bp = /^\[object .+?Constructor\]$/, xp = /^0o[0-7]+$/i, wp = /^(?:0|[1-9]\d*)$/, Sp = /[\xc0-\xd6\xd8-\xf6\xf8-\xff\u0100-\u017f]/g, To = /($^)/, Cp = /['\n\r\u2028\u2029\\]/g, _o = "\\ud800-\\udfff", Tp = "\\u0300-\\u036f", _p = "\\ufe20-\\ufe2f", Fp = "\\u20d0-\\u20ff", ec = Tp + _p + Fp, rc = "\\u2700-\\u27bf", ic = "a-z\\xdf-\\xf6\\xf8-\\xff", Op = "\\xac\\xb1\\xd7\\xf7", Pp = "\\x00-\\x2f\\x3a-\\x40\\x5b-\\x60\\x7b-\\xbf", Ap = "\\u2000-\\u206f", kp = " \\t\\x0b\\f\\xa0\\ufeff\\n\\r\\u2028\\u2029\\u1680\\u180e\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u202f\\u205f\\u3000", nc = "A-Z\\xc0-\\xd6\\xd8-\\xde", ac = "\\ufe0e\\ufe0f", oc = Op + Pp + Ap + kp, Tl = "['’]", Dp = "[" + _o + "]", sc = "[" + oc + "]", Fo = "[" + ec + "]", lc = "\\d+", Ep = "[" + rc + "]", uc = "[" + ic + "]", hc = "[^" + _o + oc + lc + rc + ic + nc + "]", _l = "\\ud83c[\\udffb-\\udfff]", Rp = "(?:" + Fo + "|" + _l + ")", cc = "[^" + _o + "]", Fl = "(?:\\ud83c[\\udde6-\\uddff]){2}", Ol = "[\\ud800-\\udbff][\\udc00-\\udfff]", kn = "[" + nc + "]", fc = "\\u200d", dc = "(?:" + uc + "|" + hc + ")", Mp = "(?:" + kn + "|" + hc + ")", vc = "(?:" + Tl + "(?:d|ll|m|re|s|t|ve))?", gc = "(?:" + Tl + "(?:D|LL|M|RE|S|T|VE))?", pc = Rp + "?", mc = "[" + ac + "]?", Ip = "(?:" + fc + "(?:" + [cc, Fl, Ol].join("|") + ")" + mc + pc + ")*", Bp = "\\d*(?:1st|2nd|3rd|(?![123])\\dth)(?=\\b|[A-Z_])", Lp = "\\d*(?:1ST|2ND|3RD|(?![123])\\dTH)(?=\\b|[a-z_])", yc = mc + pc + Ip, jp = "(?:" + [Ep, Fl, Ol].join("|") + ")" + yc, zp = "(?:" + [cc + Fo + "?", Fo, Fl, Ol, Dp].join("|") + ")", Np = RegExp(Tl, "g"), Wp = RegExp(Fo, "g"), Pl = RegExp(_l + "(?=" + _l + ")|" + zp + yc, "g"), Up = RegExp([
       kn + "?" + uc + "+" + vc + "(?=" + [sc, kn, "$"].join("|") + ")",
       Mp + "+" + gc + "(?=" + [sc, kn + dc, "$"].join("|") + ")",
       kn + "?" + dc + "+" + vc,
@@ -90,9 +90,9 @@ zs.exports;
       "parseInt",
       "setTimeout"
     ], Gp = -1, Ce = {};
-    Ce[Te] = Ce[Vr] = Ce[ui] = Ce[or] = Ce[fa] = Ce[An] = Ce[da] = Ce[va] = Ce[wl] = !0, Ce[R] = Ce[H] = Ce[ae] = Ce[Q] = Ce[ke] = Ce[tt] = Ce[pt] = Ce[Ct] = Ce[Y] = Ce[ht] = Ce[rt] = Ce[Rt] = Ce[Ft] = Ce[lt] = Ce[Jt] = !1;
+    Ce[Te] = Ce[Vr] = Ce[ui] = Ce[or] = Ce[fa] = Ce[An] = Ce[da] = Ce[va] = Ce[wl] = !0, Ce[R] = Ce[H] = Ce[ae] = Ce[Q] = Ce[De] = Ce[tt] = Ce[pt] = Ce[Ct] = Ce[Y] = Ce[ht] = Ce[rt] = Ce[Rt] = Ce[Ft] = Ce[lt] = Ce[Jt] = !1;
     var Se = {};
-    Se[R] = Se[H] = Se[ae] = Se[ke] = Se[Q] = Se[tt] = Se[Te] = Se[Vr] = Se[ui] = Se[or] = Se[fa] = Se[Y] = Se[ht] = Se[rt] = Se[Rt] = Se[Ft] = Se[lt] = Se[Pt] = Se[An] = Se[da] = Se[va] = Se[wl] = !0, Se[pt] = Se[Ct] = Se[Jt] = !1;
+    Se[R] = Se[H] = Se[ae] = Se[De] = Se[Q] = Se[tt] = Se[Te] = Se[Vr] = Se[ui] = Se[or] = Se[fa] = Se[Y] = Se[ht] = Se[rt] = Se[Rt] = Se[Ft] = Se[lt] = Se[Pt] = Se[An] = Se[da] = Se[va] = Se[wl] = !0, Se[pt] = Se[Ct] = Se[Jt] = !1;
     var Yp = {
       // Latin-1 Supplement block.
       À: "A",
@@ -596,7 +596,7 @@ zs.exports;
         }
       }(), km = ut.clearTimeout !== Ge.clearTimeout && ut.clearTimeout, Dm = Ot && Ot.now !== Ge.Date.now && Ot.now, Em = ut.setTimeout !== Ge.setTimeout && ut.setTimeout, zo = Le.ceil, No = Le.floor, Wl = xe.getOwnPropertySymbols, Rm = Mo ? Mo.isBuffer : e, Uc = ut.isFinite, Mm = ko.join, Im = Ic(xe.keys, xe), je = Le.max, Je = Le.min, Bm = Ot.now, Lm = ut.parseInt, Vc = Le.random, jm = ko.reverse, Ul = hn(ut, "DataView"), ma = hn(ut, "Map"), Vl = hn(ut, "Promise"), Bn = hn(ut, "Set"), ya = hn(ut, "WeakMap"), ba = hn(xe, "create"), Wo = ya && new ya(), Ln = {}, zm = cn(Ul), Nm = cn(ma), Wm = cn(Vl), Um = cn(Bn), Vm = cn(ya), Uo = Ei ? Ei.prototype : e, xa = Uo ? Uo.valueOf : e, Hc = Uo ? Uo.toString : e;
       function A(u) {
-        if (De(u) && !Gt(u) && !(u instanceof ee)) {
+        if (Ee(u) && !Gt(u) && !(u instanceof ee)) {
           if (u instanceof Or)
             return u;
           if (ye.call(u, "__wrapped__"))
@@ -1077,16 +1077,16 @@ zs.exports;
         return T == null ? e : dr(T, u, w);
       }
       function tf(u) {
-        return De(u) && tr(u) == R;
+        return Ee(u) && tr(u) == R;
       }
       function Fy(u) {
-        return De(u) && tr(u) == ae;
+        return Ee(u) && tr(u) == ae;
       }
       function Oy(u) {
-        return De(u) && tr(u) == tt;
+        return Ee(u) && tr(u) == tt;
       }
       function Ta(u, p, w, T, O) {
-        return u === p ? !0 : u == null || p == null || !De(u) && !De(p) ? u !== u && p !== p : Py(u, p, w, T, Ta, O);
+        return u === p ? !0 : u == null || p == null || !Ee(u) && !Ee(p) ? u !== u && p !== p : Py(u, p, w, T, Ta, O);
       }
       function Py(u, p, w, T, O, E) {
         var j = Gt(u), U = Gt(p), q = j ? H : Qe(u), dt = U ? H : Qe(p);
@@ -1109,7 +1109,7 @@ zs.exports;
         return _t ? (E || (E = new Xr()), r1(u, p, w, T, O, E)) : !1;
       }
       function Ay(u) {
-        return De(u) && Qe(u) == Y;
+        return Ee(u) && Qe(u) == Y;
       }
       function Zl(u, p, w, T) {
         var O = w.length, E = O, j = !T;
@@ -1143,13 +1143,13 @@ zs.exports;
         return p.test(cn(u));
       }
       function ky(u) {
-        return De(u) && tr(u) == Rt;
+        return Ee(u) && tr(u) == Rt;
       }
       function Dy(u) {
-        return De(u) && Qe(u) == Ft;
+        return Ee(u) && Qe(u) == Ft;
       }
       function Ey(u) {
-        return De(u) && us(u.length) && !!Ce[tr(u)];
+        return Ee(u) && us(u.length) && !!Ce[tr(u)];
       }
       function rf(u) {
         return typeof u == "function" ? u : u == null ? hr : typeof u == "object" ? Gt(u) ? of(u[0], u[1]) : af(u) : _d(u);
@@ -1885,7 +1885,7 @@ zs.exports;
       }
       function e1(u, p, w, T, O, E, j) {
         switch (w) {
-          case ke:
+          case De:
             if (u.byteLength != p.byteLength || u.byteOffset != p.byteOffset)
               return !1;
             u = u.buffer, p = p.buffer;
@@ -2011,12 +2011,12 @@ zs.exports;
           ki(p, vu(u)), u = Bo(u);
         return p;
       } : Eu, Qe = tr;
-      (Ul && Qe(new Ul(new ArrayBuffer(1))) != ke || ma && Qe(new ma()) != Y || Vl && Qe(Vl.resolve()) != gt || Bn && Qe(new Bn()) != Ft || ya && Qe(new ya()) != Jt) && (Qe = function(u) {
+      (Ul && Qe(new Ul(new ArrayBuffer(1))) != De || ma && Qe(new ma()) != Y || Vl && Qe(Vl.resolve()) != gt || Bn && Qe(new Bn()) != Ft || ya && Qe(new ya()) != Jt) && (Qe = function(u) {
         var p = tr(u), w = p == rt ? u.constructor : e, T = w ? cn(w) : "";
         if (T)
           switch (T) {
             case zm:
-              return ke;
+              return De;
             case Nm:
               return Y;
             case Wm:
@@ -2077,7 +2077,7 @@ zs.exports;
           case Q:
           case tt:
             return new T(+u);
-          case ke:
+          case De:
             return Hy(u, w);
           case Te:
           case Vr:
@@ -2915,20 +2915,20 @@ zs.exports;
       }), fn = tf(function() {
         return arguments;
       }()) ? tf : function(u) {
-        return De(u) && ye.call(u, "callee") && !Nc.call(u, "callee");
+        return Ee(u) && ye.call(u, "callee") && !Nc.call(u, "callee");
       }, Gt = it.isArray, yx = wc ? vr(wc) : Fy;
       function lr(u) {
         return u != null && us(u.length) && !pi(u);
       }
       function Re(u) {
-        return De(u) && lr(u);
+        return Ee(u) && lr(u);
       }
       function bx(u) {
-        return u === !0 || u === !1 || De(u) && tr(u) == Q;
+        return u === !0 || u === !1 || Ee(u) && tr(u) == Q;
       }
       var Li = Rm || Ru, xx = Sc ? vr(Sc) : Oy;
       function wx(u) {
-        return De(u) && u.nodeType === 1 && !Aa(u);
+        return Ee(u) && u.nodeType === 1 && !Aa(u);
       }
       function Sx(u) {
         if (u == null)
@@ -2954,7 +2954,7 @@ zs.exports;
         return T === e ? Ta(u, p, e, w) : !!T;
       }
       function Cu(u) {
-        if (!De(u))
+        if (!Ee(u))
           return !1;
         var p = tr(u);
         return p == pt || p == ct || typeof u.message == "string" && typeof u.name == "string" && !Aa(u);
@@ -2978,7 +2978,7 @@ zs.exports;
         var p = typeof u;
         return u != null && (p == "object" || p == "function");
       }
-      function De(u) {
+      function Ee(u) {
         return u != null && typeof u == "object";
       }
       var hd = Cc ? vr(Cc) : Ay;
@@ -3003,10 +3003,10 @@ zs.exports;
         return u == null;
       }
       function cd(u) {
-        return typeof u == "number" || De(u) && tr(u) == ht;
+        return typeof u == "number" || Ee(u) && tr(u) == ht;
       }
       function Aa(u) {
-        if (!De(u) || tr(u) != rt)
+        if (!Ee(u) || tr(u) != rt)
           return !1;
         var p = Bo(u);
         if (p === null)
@@ -3020,20 +3020,20 @@ zs.exports;
       }
       var fd = _c ? vr(_c) : Dy;
       function hs(u) {
-        return typeof u == "string" || !Gt(u) && De(u) && tr(u) == lt;
+        return typeof u == "string" || !Gt(u) && Ee(u) && tr(u) == lt;
       }
       function pr(u) {
-        return typeof u == "symbol" || De(u) && tr(u) == Pt;
+        return typeof u == "symbol" || Ee(u) && tr(u) == Pt;
       }
       var Un = Fc ? vr(Fc) : Ey;
       function Rx(u) {
         return u === e;
       }
       function Mx(u) {
-        return De(u) && Qe(u) == Jt;
+        return Ee(u) && Qe(u) == Jt;
       }
       function Ix(u) {
-        return De(u) && tr(u) == we;
+        return Ee(u) && tr(u) == we;
       }
       var Bx = ts(Ql), Lx = ts(function(u, p) {
         return u <= p;
@@ -3603,7 +3603,7 @@ function print() { __p += __j.call(arguments, '') }
       function kS(u, p) {
         return u && u.length ? Bl(u, Et(p, 2)) : 0;
       }
-      return A.after = Qb, A.ary = rd, A.assign = zx, A.assignIn = pd, A.assignInWith = cs, A.assignWith = Nx, A.at = Wx, A.before = id, A.bind = wu, A.bindAll = Gw, A.bindKey = nd, A.castArray = hx, A.chain = $f, A.chunk = b1, A.compact = x1, A.concat = w1, A.cond = Yw, A.conforms = qw, A.constant = Pu, A.countBy = Ab, A.create = Ux, A.curry = ad, A.curryRight = od, A.debounce = sd, A.defaults = Vx, A.defaultsDeep = Hx, A.defer = $b, A.delay = tx, A.difference = S1, A.differenceBy = C1, A.differenceWith = T1, A.drop = _1, A.dropRight = F1, A.dropRightWhile = O1, A.dropWhile = P1, A.fill = A1, A.filter = Db, A.flatMap = Mb, A.flatMapDeep = Ib, A.flatMapDepth = Bb, A.flatten = Kf, A.flattenDeep = k1, A.flattenDepth = D1, A.flip = ex, A.flow = Zw, A.flowRight = Jw, A.fromPairs = E1, A.functions = Jx, A.functionsIn = Qx, A.groupBy = Lb, A.initial = M1, A.intersection = I1, A.intersectionBy = B1, A.intersectionWith = L1, A.invert = tw, A.invertBy = ew, A.invokeMap = zb, A.iteratee = Au, A.keyBy = Nb, A.keys = He, A.keysIn = ur, A.map = as, A.mapKeys = iw, A.mapValues = nw, A.matches = Qw, A.matchesProperty = $w, A.memoize = ss, A.merge = aw, A.mergeWith = md, A.method = tS, A.methodOf = eS, A.mixin = ku, A.negate = ls, A.nthArg = iS, A.omit = ow, A.omitBy = sw, A.once = rx, A.orderBy = Wb, A.over = nS, A.overArgs = ix, A.overEvery = aS, A.overSome = oS, A.partial = Su, A.partialRight = ld, A.partition = Ub, A.pick = lw, A.pickBy = yd, A.property = _d, A.propertyOf = sS, A.pull = W1, A.pullAll = Jf, A.pullAllBy = U1, A.pullAllWith = V1, A.pullAt = H1, A.range = lS, A.rangeRight = uS, A.rearg = nx, A.reject = Xb, A.remove = X1, A.rest = ax, A.reverse = bu, A.sampleSize = Yb, A.set = hw, A.setWith = cw, A.shuffle = qb, A.slice = G1, A.sortBy = Jb, A.sortedUniq = $1, A.sortedUniqBy = tb, A.split = Mw, A.spread = ox, A.tail = eb, A.take = rb, A.takeRight = ib, A.takeRightWhile = nb, A.takeWhile = ab, A.tap = xb, A.throttle = sx, A.thru = ns, A.toArray = dd, A.toPairs = bd, A.toPairsIn = xd, A.toPath = vS, A.toPlainObject = gd, A.transform = fw, A.unary = lx, A.union = ob, A.unionBy = sb, A.unionWith = lb, A.uniq = ub, A.uniqBy = hb, A.uniqWith = cb, A.unset = dw, A.unzip = xu, A.unzipWith = Qf, A.update = vw, A.updateWith = gw, A.values = Vn, A.valuesIn = pw, A.without = fb, A.words = Cd, A.wrap = ux, A.xor = db, A.xorBy = vb, A.xorWith = gb, A.zip = pb, A.zipObject = mb, A.zipObjectDeep = yb, A.zipWith = bb, A.entries = bd, A.entriesIn = xd, A.extend = pd, A.extendWith = cs, ku(A, A), A.add = pS, A.attempt = Td, A.camelCase = xw, A.capitalize = wd, A.ceil = mS, A.clamp = mw, A.clone = cx, A.cloneDeep = dx, A.cloneDeepWith = vx, A.cloneWith = fx, A.conformsTo = gx, A.deburr = Sd, A.defaultTo = Kw, A.divide = yS, A.endsWith = ww, A.eq = Gr, A.escape = Sw, A.escapeRegExp = Cw, A.every = kb, A.find = Eb, A.findIndex = Yf, A.findKey = Xx, A.findLast = Rb, A.findLastIndex = qf, A.findLastKey = Gx, A.floor = bS, A.forEach = td, A.forEachRight = ed, A.forIn = Yx, A.forInRight = qx, A.forOwn = Kx, A.forOwnRight = Zx, A.get = _u, A.gt = px, A.gte = mx, A.has = $x, A.hasIn = Fu, A.head = Zf, A.identity = hr, A.includes = jb, A.indexOf = R1, A.inRange = yw, A.invoke = rw, A.isArguments = fn, A.isArray = Gt, A.isArrayBuffer = yx, A.isArrayLike = lr, A.isArrayLikeObject = Re, A.isBoolean = bx, A.isBuffer = Li, A.isDate = xx, A.isElement = wx, A.isEmpty = Sx, A.isEqual = Cx, A.isEqualWith = Tx, A.isError = Cu, A.isFinite = _x, A.isFunction = pi, A.isInteger = ud, A.isLength = us, A.isMap = hd, A.isMatch = Fx, A.isMatchWith = Ox, A.isNaN = Px, A.isNative = Ax, A.isNil = Dx, A.isNull = kx, A.isNumber = cd, A.isObject = Pe, A.isObjectLike = De, A.isPlainObject = Aa, A.isRegExp = Tu, A.isSafeInteger = Ex, A.isSet = fd, A.isString = hs, A.isSymbol = pr, A.isTypedArray = Un, A.isUndefined = Rx, A.isWeakMap = Mx, A.isWeakSet = Ix, A.join = j1, A.kebabCase = Tw, A.last = kr, A.lastIndexOf = z1, A.lowerCase = _w, A.lowerFirst = Fw, A.lt = Bx, A.lte = Lx, A.max = xS, A.maxBy = wS, A.mean = SS, A.meanBy = CS, A.min = TS, A.minBy = _S, A.stubArray = Eu, A.stubFalse = Ru, A.stubObject = hS, A.stubString = cS, A.stubTrue = fS, A.multiply = FS, A.nth = N1, A.noConflict = rS, A.noop = Du, A.now = os, A.pad = Ow, A.padEnd = Pw, A.padStart = Aw, A.parseInt = kw, A.random = bw, A.reduce = Vb, A.reduceRight = Hb, A.repeat = Dw, A.replace = Ew, A.result = uw, A.round = OS, A.runInContext = G, A.sample = Gb, A.size = Kb, A.snakeCase = Rw, A.some = Zb, A.sortedIndex = Y1, A.sortedIndexBy = q1, A.sortedIndexOf = K1, A.sortedLastIndex = Z1, A.sortedLastIndexBy = J1, A.sortedLastIndexOf = Q1, A.startCase = Iw, A.startsWith = Bw, A.subtract = PS, A.sum = AS, A.sumBy = kS, A.template = Lw, A.times = dS, A.toFinite = mi, A.toInteger = Zt, A.toLength = vd, A.toLower = jw, A.toNumber = Dr, A.toSafeInteger = jx, A.toString = me, A.toUpper = zw, A.trim = Nw, A.trimEnd = Ww, A.trimStart = Uw, A.truncate = Vw, A.unescape = Hw, A.uniqueId = gS, A.upperCase = Xw, A.upperFirst = Ou, A.each = td, A.eachRight = ed, A.first = Zf, ku(A, function() {
+      return A.after = Qb, A.ary = rd, A.assign = zx, A.assignIn = pd, A.assignInWith = cs, A.assignWith = Nx, A.at = Wx, A.before = id, A.bind = wu, A.bindAll = Gw, A.bindKey = nd, A.castArray = hx, A.chain = $f, A.chunk = b1, A.compact = x1, A.concat = w1, A.cond = Yw, A.conforms = qw, A.constant = Pu, A.countBy = Ab, A.create = Ux, A.curry = ad, A.curryRight = od, A.debounce = sd, A.defaults = Vx, A.defaultsDeep = Hx, A.defer = $b, A.delay = tx, A.difference = S1, A.differenceBy = C1, A.differenceWith = T1, A.drop = _1, A.dropRight = F1, A.dropRightWhile = O1, A.dropWhile = P1, A.fill = A1, A.filter = Db, A.flatMap = Mb, A.flatMapDeep = Ib, A.flatMapDepth = Bb, A.flatten = Kf, A.flattenDeep = k1, A.flattenDepth = D1, A.flip = ex, A.flow = Zw, A.flowRight = Jw, A.fromPairs = E1, A.functions = Jx, A.functionsIn = Qx, A.groupBy = Lb, A.initial = M1, A.intersection = I1, A.intersectionBy = B1, A.intersectionWith = L1, A.invert = tw, A.invertBy = ew, A.invokeMap = zb, A.iteratee = Au, A.keyBy = Nb, A.keys = He, A.keysIn = ur, A.map = as, A.mapKeys = iw, A.mapValues = nw, A.matches = Qw, A.matchesProperty = $w, A.memoize = ss, A.merge = aw, A.mergeWith = md, A.method = tS, A.methodOf = eS, A.mixin = ku, A.negate = ls, A.nthArg = iS, A.omit = ow, A.omitBy = sw, A.once = rx, A.orderBy = Wb, A.over = nS, A.overArgs = ix, A.overEvery = aS, A.overSome = oS, A.partial = Su, A.partialRight = ld, A.partition = Ub, A.pick = lw, A.pickBy = yd, A.property = _d, A.propertyOf = sS, A.pull = W1, A.pullAll = Jf, A.pullAllBy = U1, A.pullAllWith = V1, A.pullAt = H1, A.range = lS, A.rangeRight = uS, A.rearg = nx, A.reject = Xb, A.remove = X1, A.rest = ax, A.reverse = bu, A.sampleSize = Yb, A.set = hw, A.setWith = cw, A.shuffle = qb, A.slice = G1, A.sortBy = Jb, A.sortedUniq = $1, A.sortedUniqBy = tb, A.split = Mw, A.spread = ox, A.tail = eb, A.take = rb, A.takeRight = ib, A.takeRightWhile = nb, A.takeWhile = ab, A.tap = xb, A.throttle = sx, A.thru = ns, A.toArray = dd, A.toPairs = bd, A.toPairsIn = xd, A.toPath = vS, A.toPlainObject = gd, A.transform = fw, A.unary = lx, A.union = ob, A.unionBy = sb, A.unionWith = lb, A.uniq = ub, A.uniqBy = hb, A.uniqWith = cb, A.unset = dw, A.unzip = xu, A.unzipWith = Qf, A.update = vw, A.updateWith = gw, A.values = Vn, A.valuesIn = pw, A.without = fb, A.words = Cd, A.wrap = ux, A.xor = db, A.xorBy = vb, A.xorWith = gb, A.zip = pb, A.zipObject = mb, A.zipObjectDeep = yb, A.zipWith = bb, A.entries = bd, A.entriesIn = xd, A.extend = pd, A.extendWith = cs, ku(A, A), A.add = pS, A.attempt = Td, A.camelCase = xw, A.capitalize = wd, A.ceil = mS, A.clamp = mw, A.clone = cx, A.cloneDeep = dx, A.cloneDeepWith = vx, A.cloneWith = fx, A.conformsTo = gx, A.deburr = Sd, A.defaultTo = Kw, A.divide = yS, A.endsWith = ww, A.eq = Gr, A.escape = Sw, A.escapeRegExp = Cw, A.every = kb, A.find = Eb, A.findIndex = Yf, A.findKey = Xx, A.findLast = Rb, A.findLastIndex = qf, A.findLastKey = Gx, A.floor = bS, A.forEach = td, A.forEachRight = ed, A.forIn = Yx, A.forInRight = qx, A.forOwn = Kx, A.forOwnRight = Zx, A.get = _u, A.gt = px, A.gte = mx, A.has = $x, A.hasIn = Fu, A.head = Zf, A.identity = hr, A.includes = jb, A.indexOf = R1, A.inRange = yw, A.invoke = rw, A.isArguments = fn, A.isArray = Gt, A.isArrayBuffer = yx, A.isArrayLike = lr, A.isArrayLikeObject = Re, A.isBoolean = bx, A.isBuffer = Li, A.isDate = xx, A.isElement = wx, A.isEmpty = Sx, A.isEqual = Cx, A.isEqualWith = Tx, A.isError = Cu, A.isFinite = _x, A.isFunction = pi, A.isInteger = ud, A.isLength = us, A.isMap = hd, A.isMatch = Fx, A.isMatchWith = Ox, A.isNaN = Px, A.isNative = Ax, A.isNil = Dx, A.isNull = kx, A.isNumber = cd, A.isObject = Pe, A.isObjectLike = Ee, A.isPlainObject = Aa, A.isRegExp = Tu, A.isSafeInteger = Ex, A.isSet = fd, A.isString = hs, A.isSymbol = pr, A.isTypedArray = Un, A.isUndefined = Rx, A.isWeakMap = Mx, A.isWeakSet = Ix, A.join = j1, A.kebabCase = Tw, A.last = kr, A.lastIndexOf = z1, A.lowerCase = _w, A.lowerFirst = Fw, A.lt = Bx, A.lte = Lx, A.max = xS, A.maxBy = wS, A.mean = SS, A.meanBy = CS, A.min = TS, A.minBy = _S, A.stubArray = Eu, A.stubFalse = Ru, A.stubObject = hS, A.stubString = cS, A.stubTrue = fS, A.multiply = FS, A.nth = N1, A.noConflict = rS, A.noop = Du, A.now = os, A.pad = Ow, A.padEnd = Pw, A.padStart = Aw, A.parseInt = kw, A.random = bw, A.reduce = Vb, A.reduceRight = Hb, A.repeat = Dw, A.replace = Ew, A.result = uw, A.round = OS, A.runInContext = G, A.sample = Gb, A.size = Kb, A.snakeCase = Rw, A.some = Zb, A.sortedIndex = Y1, A.sortedIndexBy = q1, A.sortedIndexOf = K1, A.sortedLastIndex = Z1, A.sortedLastIndexBy = J1, A.sortedLastIndexOf = Q1, A.startCase = Iw, A.startsWith = Bw, A.subtract = PS, A.sum = AS, A.sumBy = kS, A.template = Lw, A.times = dS, A.toFinite = mi, A.toInteger = Zt, A.toLength = vd, A.toLower = jw, A.toNumber = Dr, A.toSafeInteger = jx, A.toString = me, A.toUpper = zw, A.trim = Nw, A.trimEnd = Ww, A.trimStart = Uw, A.truncate = Vw, A.unescape = Hw, A.uniqueId = gS, A.upperCase = Xw, A.upperFirst = Ou, A.each = td, A.eachRight = ed, A.first = Zf, ku(A, function() {
         var u = {};
         return $r(A, function(p, w) {
           ye.call(A.prototype, w) || (u[w] = p);
@@ -4980,9 +4980,9 @@ const MS = {}, IS = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineP
         Tt = (et === B ? -1 : 1) * Math.sqrt(gt / (Y * ft + ht * rt));
       var Ft = Tt * L * at / N, lt = -Tt * N * Ct / L, Pt = tt * Ft - Q * lt + k * 0.5, Vt = Q * Ft + tt * lt + W * 0.5, Jt = h(1, 0, (Ct - Ft) / L, (at - lt) / N), we = h((Ct - Ft) / L, (at - lt) / N, (-Ct - Ft) / L, (-at - lt) / N);
       B === 0 && we > 0 ? we -= 2 * H : B === 1 && we < 0 && (we += 2 * H);
-      for (var ae = Math.ceil(Math.abs(we / H * 2)), ke = [], Te = we / ae, Vr = 8 / 3 * Math.sin(Te / 4) * Math.sin(Te / 4) / Math.sin(Te / 2), ui = Jt + Te, or = 0; or < ae; or++)
-        ke[or] = f(Jt, ui, tt, Q, L, N, Pt, Vt, Vr, ct, pt), ct = ke[or][5], pt = ke[or][6], Jt = ui, ui += Te;
-      return ke;
+      for (var ae = Math.ceil(Math.abs(we / H * 2)), De = [], Te = we / ae, Vr = 8 / 3 * Math.sin(Te / 4) * Math.sin(Te / 4) / Math.sin(Te / 2), ui = Jt + Te, or = 0; or < ae; or++)
+        De[or] = f(Jt, ui, tt, Q, L, N, Pt, Vt, Vr, ct, pt), ct = De[or][5], pt = De[or][6], Jt = ui, ui += Te;
+      return De;
     }
     function h(k, W, L, N) {
       var et = Math.atan2(W, k), B = Math.atan2(N, L);
@@ -5006,7 +5006,7 @@ const MS = {}, IS = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineP
       for (var Pt, Vt, Jt = Ct.length, we = Jt, ae; Jt--; )
         rt = Ct[Jt], ae = 1 - rt, Pt = ae * ae * ae * k + 3 * ae * ae * rt * L + 3 * ae * rt * rt * et + rt * rt * rt * R, at[0][Jt] = Pt, Vt = ae * ae * ae * W + 3 * ae * ae * rt * N + 3 * ae * rt * rt * B + rt * rt * rt * H, at[1][Jt] = Vt;
       at[0][we] = k, at[1][we] = W, at[0][we + 1] = R, at[1][we + 1] = H;
-      var ke = [
+      var De = [
         {
           x: tt.apply(null, at[0]),
           y: tt.apply(null, at[1])
@@ -5016,7 +5016,7 @@ const MS = {}, IS = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineP
           y: ct.apply(null, at[1])
         }
       ];
-      return t.cachesBoundsOfCurve && (t.boundsOfCurveCache[K] = ke), ke;
+      return t.cachesBoundsOfCurve && (t.boundsOfCurveCache[K] = De), De;
     }
     function v(k, W, L) {
       for (var N = L[1], et = L[2], B = L[3], R = L[4], H = L[5], K = L[6], Q = L[7], tt = l(K - k, Q - W, N, et, R, H, B), ct = 0, pt = tt.length; ct < pt; ct++)
@@ -6035,8 +6035,8 @@ const MS = {}, IS = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineP
         lt.replace(Ft, function(we) {
           var ae = new RegExp(rt).exec(we).filter(function(Vr) {
             return !!Vr;
-          }), ke = ae[1], Te = ae.slice(2).map(parseFloat);
-          switch (ke) {
+          }), De = ae[1], Te = ae.slice(2).map(parseFloat);
+          switch (De) {
             case "translate":
               K(Pt, Te);
               break;
@@ -7273,20 +7273,20 @@ const MS = {}, IS = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineP
     }
     function R(at, Y, ht, ft, rt) {
       rt = rt || {};
-      var gt = Y.target, Tt = gt.lockScalingX, Rt = gt.lockScalingY, Ft = rt.by, lt, Pt, Vt, Jt, we = F(at, gt), ae = D(gt, Ft, we), ke, Te, Vr = Y.gestureScale;
+      var gt = Y.target, Tt = gt.lockScalingX, Rt = gt.lockScalingY, Ft = rt.by, lt, Pt, Vt, Jt, we = F(at, gt), ae = D(gt, Ft, we), De, Te, Vr = Y.gestureScale;
       if (ae)
         return !1;
       if (Vr)
         Pt = Y.scaleX * Vr, Vt = Y.scaleY * Vr;
       else {
-        if (lt = bt(Y, Y.originX, Y.originY, ht, ft), ke = Ft !== "y" ? S(lt.x) : 1, Te = Ft !== "x" ? S(lt.y) : 1, Y.signX || (Y.signX = ke), Y.signY || (Y.signY = Te), gt.lockScalingFlip && (Y.signX !== ke || Y.signY !== Te))
+        if (lt = bt(Y, Y.originX, Y.originY, ht, ft), De = Ft !== "y" ? S(lt.x) : 1, Te = Ft !== "x" ? S(lt.y) : 1, Y.signX || (Y.signX = De), Y.signY || (Y.signY = Te), gt.lockScalingFlip && (Y.signX !== De || Y.signY !== Te))
           return !1;
         if (Jt = gt._getTransformedDimensions(), we && !Ft) {
           var ui = Math.abs(lt.x) + Math.abs(lt.y), or = Y.original, fa = Math.abs(Jt.x * or.scaleX / gt.scaleX) + Math.abs(Jt.y * or.scaleY / gt.scaleY), An = ui / fa;
           Pt = or.scaleX * An, Vt = or.scaleY * An;
         } else
           Pt = Math.abs(lt.x * gt.scaleX / Jt.x), Vt = Math.abs(lt.y * gt.scaleY / Jt.y);
-        P(Y) && (Pt *= 2, Vt *= 2), Y.signX !== ke && Ft !== "y" && (Y.originX = b[Y.originX], Pt *= -1, Y.signX = ke), Y.signY !== Te && Ft !== "x" && (Y.originY = b[Y.originY], Vt *= -1, Y.signY = Te);
+        P(Y) && (Pt *= 2, Vt *= 2), Y.signX !== De && Ft !== "y" && (Y.originX = b[Y.originX], Pt *= -1, Y.signX = De), Y.signY !== Te && Ft !== "x" && (Y.originY = b[Y.originY], Vt *= -1, Y.signY = Te);
       }
       var da = gt.scaleX, va = gt.scaleY;
       return Ft ? (Ft === "x" && gt.set("scaleX", Pt), Ft === "y" && gt.set("scaleY", Vt)) : (!Tt && gt.set("scaleX", Pt), !Rt && gt.set("scaleY", Vt)), da !== gt.scaleX || va !== gt.scaleY;
@@ -22010,11 +22010,11 @@ function Pd(r) {
 }
 class HS {
   constructor(t, e) {
-    Ee(this, "fabricPage");
-    Ee(this, "pdfPage");
-    Ee(this, "fabricDim");
-    Ee(this, "pdfDim");
-    Ee(this, "alpha");
+    Ae(this, "fabricPage");
+    Ae(this, "pdfPage");
+    Ae(this, "fabricDim");
+    Ae(this, "pdfDim");
+    Ae(this, "alpha");
     this.fabricPage = t, this.pdfPage = e, this.pdfDim = { width: e.getWidth(), height: e.getHeight() }, this.fabricDim = { width: t.getScaledWidth(), height: t.getScaledHeight() }, this.alpha = this.pdfDim.width / this.fabricDim.width;
   }
   getPDFCoords(t) {
@@ -28984,10 +28984,10 @@ var Rr;
 (function(r) {
   r[r.NoToggleToOff = Be(15 - 1)] = "NoToggleToOff", r[r.Radio = Be(16 - 1)] = "Radio", r[r.PushButton = Be(17 - 1)] = "PushButton", r[r.RadiosInUnison = Be(26 - 1)] = "RadiosInUnison";
 })(Rr || (Rr = {}));
-var Ae;
+var ke;
 (function(r) {
   r[r.Multiline = Be(13 - 1)] = "Multiline", r[r.Password = Be(14 - 1)] = "Password", r[r.FileSelect = Be(21 - 1)] = "FileSelect", r[r.DoNotSpellCheck = Be(23 - 1)] = "DoNotSpellCheck", r[r.DoNotScroll = Be(24 - 1)] = "DoNotScroll", r[r.Comb = Be(25 - 1)] = "Comb", r[r.RichText = Be(26 - 1)] = "RichText";
-})(Ae || (Ae = {}));
+})(ke || (ke = {}));
 var de;
 (function(r) {
   r[r.Combo = Be(18 - 1)] = "Combo", r[r.Edit = Be(19 - 1)] = "Edit", r[r.Sort = Be(20 - 1)] = "Sort", r[r.MultiSelect = Be(22 - 1)] = "MultiSelect", r[r.DoNotSpellCheck = Be(23 - 1)] = "DoNotSpellCheck", r[r.CommitOnSelChange = Be(27 - 1)] = "CommitOnSelChange";
@@ -31853,51 +31853,51 @@ var ca = function(r) {
     }, t.prototype.setFontSize = function(e) {
       sl(e, "fontSize"), this.acroField.setFontSize(e), this.markAsDirty();
     }, t.prototype.isMultiline = function() {
-      return this.acroField.hasFlag(Ae.Multiline);
+      return this.acroField.hasFlag(ke.Multiline);
     }, t.prototype.enableMultiline = function() {
-      this.markAsDirty(), this.acroField.setFlagTo(Ae.Multiline, !0);
+      this.markAsDirty(), this.acroField.setFlagTo(ke.Multiline, !0);
     }, t.prototype.disableMultiline = function() {
-      this.markAsDirty(), this.acroField.setFlagTo(Ae.Multiline, !1);
+      this.markAsDirty(), this.acroField.setFlagTo(ke.Multiline, !1);
     }, t.prototype.isPassword = function() {
-      return this.acroField.hasFlag(Ae.Password);
+      return this.acroField.hasFlag(ke.Password);
     }, t.prototype.enablePassword = function() {
-      this.acroField.setFlagTo(Ae.Password, !0);
+      this.acroField.setFlagTo(ke.Password, !0);
     }, t.prototype.disablePassword = function() {
-      this.acroField.setFlagTo(Ae.Password, !1);
+      this.acroField.setFlagTo(ke.Password, !1);
     }, t.prototype.isFileSelector = function() {
-      return this.acroField.hasFlag(Ae.FileSelect);
+      return this.acroField.hasFlag(ke.FileSelect);
     }, t.prototype.enableFileSelection = function() {
-      this.acroField.setFlagTo(Ae.FileSelect, !0);
+      this.acroField.setFlagTo(ke.FileSelect, !0);
     }, t.prototype.disableFileSelection = function() {
-      this.acroField.setFlagTo(Ae.FileSelect, !1);
+      this.acroField.setFlagTo(ke.FileSelect, !1);
     }, t.prototype.isSpellChecked = function() {
-      return !this.acroField.hasFlag(Ae.DoNotSpellCheck);
+      return !this.acroField.hasFlag(ke.DoNotSpellCheck);
     }, t.prototype.enableSpellChecking = function() {
-      this.acroField.setFlagTo(Ae.DoNotSpellCheck, !1);
+      this.acroField.setFlagTo(ke.DoNotSpellCheck, !1);
     }, t.prototype.disableSpellChecking = function() {
-      this.acroField.setFlagTo(Ae.DoNotSpellCheck, !0);
+      this.acroField.setFlagTo(ke.DoNotSpellCheck, !0);
     }, t.prototype.isScrollable = function() {
-      return !this.acroField.hasFlag(Ae.DoNotScroll);
+      return !this.acroField.hasFlag(ke.DoNotScroll);
     }, t.prototype.enableScrolling = function() {
-      this.acroField.setFlagTo(Ae.DoNotScroll, !1);
+      this.acroField.setFlagTo(ke.DoNotScroll, !1);
     }, t.prototype.disableScrolling = function() {
-      this.acroField.setFlagTo(Ae.DoNotScroll, !0);
+      this.acroField.setFlagTo(ke.DoNotScroll, !0);
     }, t.prototype.isCombed = function() {
-      return this.acroField.hasFlag(Ae.Comb) && !this.isMultiline() && !this.isPassword() && !this.isFileSelector() && this.getMaxLength() !== void 0;
+      return this.acroField.hasFlag(ke.Comb) && !this.isMultiline() && !this.isPassword() && !this.isFileSelector() && this.getMaxLength() !== void 0;
     }, t.prototype.enableCombing = function() {
       if (this.getMaxLength() === void 0) {
         var e = "PDFTextFields must have a max length in order to be combed";
         console.warn(e);
       }
-      this.markAsDirty(), this.disableMultiline(), this.disablePassword(), this.disableFileSelection(), this.acroField.setFlagTo(Ae.Comb, !0);
+      this.markAsDirty(), this.disableMultiline(), this.disablePassword(), this.disableFileSelection(), this.acroField.setFlagTo(ke.Comb, !0);
     }, t.prototype.disableCombing = function() {
-      this.markAsDirty(), this.acroField.setFlagTo(Ae.Comb, !1);
+      this.markAsDirty(), this.acroField.setFlagTo(ke.Comb, !1);
     }, t.prototype.isRichFormatted = function() {
-      return this.acroField.hasFlag(Ae.RichText);
+      return this.acroField.hasFlag(ke.RichText);
     }, t.prototype.enableRichFormatting = function() {
-      this.acroField.setFlagTo(Ae.RichText, !0);
+      this.acroField.setFlagTo(ke.RichText, !0);
     }, t.prototype.disableRichFormatting = function() {
-      this.acroField.setFlagTo(Ae.RichText, !1);
+      this.acroField.setFlagTo(ke.RichText, !1);
     }, t.prototype.addToPage = function(e, i) {
       var n, d, y, c, a, o, f;
       Z(e, "page", [[Mr, "PDFPage"]]), ca(i), i || (i = {}), "textColor" in i || (i.textColor = pe(0, 0, 0)), "backgroundColor" in i || (i.backgroundColor = pe(1, 1, 1)), "borderColor" in i || (i.borderColor = pe(0, 0, 0)), "borderWidth" in i || (i.borderWidth = 1);
@@ -33217,19 +33217,19 @@ async function HF(r) {
 }
 class Zg {
   constructor(t) {
-    Ee(this, "canvas");
-    Ee(this, "pdfUrl");
-    Ee(this, "imageUrl");
-    Ee(this, "dragging", {
+    Ae(this, "canvas");
+    Ae(this, "pdfUrl");
+    Ae(this, "imageUrl");
+    Ae(this, "dragging", {
       isDragging: !1,
       lastPosX: 0,
       lastPosY: 0
     });
-    Ee(this, "pinching", {
+    Ae(this, "pinching", {
       isPinching: !1,
       lastDistance: 0
     });
-    Ee(this, "boundary", {
+    Ae(this, "boundary", {
       left: 0,
       right: 0,
       top: 0,
@@ -33237,7 +33237,7 @@ class Zg {
       zoomIn: 2,
       zoomOut: 0.1
     });
-    Ee(this, "hardBoundary", {
+    Ae(this, "hardBoundary", {
       left: 0,
       right: 0,
       top: 0,
@@ -33245,15 +33245,20 @@ class Zg {
       zoomIn: 2,
       zoomOut: 0.1
     });
-    Ee(this, "currentPage", 1);
-    Ee(this, "totalPages", 1);
-    Ee(this, "drawing", {
+    Ae(this, "currentPage", 1);
+    Ae(this, "totalPages", 1);
+    Ae(this, "drawing", {
       isDrawing: !1,
       tool: "pen"
     });
-    Ee(this, "orientation", "landscape");
-    Ee(this, "pages", []);
-    Ee(this, "debugLines", []);
+    Ae(this, "twoFingerScrolling", {
+      isScrolling: !1,
+      lastMidX: 0,
+      lastMidY: 0
+    });
+    Ae(this, "orientation", "landscape");
+    Ae(this, "pages", []);
+    Ae(this, "debugLines", []);
     this.canvas = new Oe.fabric.Canvas(t);
   }
   async setup(t, e) {
@@ -33298,7 +33303,12 @@ class Zg {
       const e = t.e;
       if (e.touches.length === 2) {
         const i = { x: e.touches[0].clientX, y: e.touches[0].clientY }, n = { x: e.touches[1].clientX, y: e.touches[1].clientY };
-        this.pinchZoom(i, n);
+        if (this.pinchZoom(i, n), this.twoFingerScrolling.isScrolling) {
+          const d = (i.x + n.x) / 2, y = (i.y + n.y) / 2, c = d - this.twoFingerScrolling.lastMidX, a = y - this.twoFingerScrolling.lastMidY, o = [...this.canvas.viewportTransform || []];
+          o[4] += c, o[5] += a;
+          const { vpt: f } = this.moveViewportIntoBoundary(o);
+          this.canvas.setViewportTransform(f), this.canvas.requestRenderAll(), this.updateCurrentPage(), this.twoFingerScrolling.lastMidX = d, this.twoFingerScrolling.lastMidY = y;
+        }
       }
     }), this.canvas.on("mouse:down", (t) => {
       if (this.canvas.getActiveObject())
@@ -33306,7 +33316,7 @@ class Zg {
       if (!t.pointer)
         throw new Error("`opt` is not TouchEvent");
       const e = t.e;
-      e.touches.length === 1 && (this.canvas.selection = !1, this.dragging.isDragging = !0, this.dragging.lastPosX = t.pointer.x, this.dragging.lastPosY = t.pointer.y), e.touches.length === 2 && (this.canvas.selection = !1);
+      e.touches.length === 1 && (this.canvas.selection = !1, this.dragging.isDragging = !0, this.dragging.lastPosX = t.pointer.x, this.dragging.lastPosY = t.pointer.y), e.touches.length === 2 && (this.canvas.selection = !1, this.dragging.isDragging = !1, this.drawing.isDrawing && (this.twoFingerScrolling.isScrolling = !0, this.twoFingerScrolling.lastMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2, this.twoFingerScrolling.lastMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2));
     }), this.canvas.on("mouse:move", (t) => {
       if (!t.pointer)
         throw new Error("`opt` is not TouchEvent");
@@ -33320,7 +33330,7 @@ class Zg {
     }), this.canvas.on("mouse:up", () => {
       if (!this.canvas)
         throw new Error("`this.canvas` is not initialized");
-      this.dragging.isDragging && this.canvas.viewportTransform && (this.canvas.setViewportTransform(this.canvas.viewportTransform), this.dragging.isDragging = !1), this.pinching.lastDistance = 0;
+      this.dragging.isDragging && this.canvas.viewportTransform && (this.canvas.setViewportTransform(this.canvas.viewportTransform), this.dragging.isDragging = !1), this.pinching.lastDistance = 0, this.twoFingerScrolling.isScrolling = !1;
     });
   }
   dragPan(t) {
@@ -33535,16 +33545,16 @@ class XF extends Zg {
   constructor() {
     super(...arguments);
     // canvas: fabric.Canvas
-    Ee(this, "dragging", {
+    Ae(this, "dragging", {
       isDragging: !1,
       lastPosX: 0,
       lastPosY: 0
     });
-    Ee(this, "pinching", {
+    Ae(this, "pinching", {
       isPinching: !1,
       lastDistance: 0
     });
-    Ee(this, "boundary", {
+    Ae(this, "boundary", {
       left: 0,
       right: 0,
       top: 0,
