@@ -271,17 +271,19 @@ export class MobileCanvasController implements PDFCanvasController {
   }
 
   setupCanvasDimensions () {
-    const wrapper = this.canvas.getElement().parentElement?.parentElement
-    if (!wrapper) {
+    let el: HTMLElement | null = this.canvas.getElement().parentElement
+    while (el && !el.hasAttribute('data-width')) {
+      el = el.parentElement
+    }
+    if (!el) {
       throw new Error("Can't find canvas wrapper")
     }
 
-    const width = Number(wrapper.getAttribute('data-width')) || wrapper.offsetWidth
+    const width = Number(el.getAttribute('data-width')) || el.offsetWidth
     this.canvas.setWidth(width - 2)
-    const height = Number(wrapper.getAttribute('data-height'))
+    const height = Number(el.getAttribute('data-height'))
     this.canvas.setHeight(height)
 
-    // Setup background color
     this.canvas.setBackgroundColor('#eeeeee', () => { /**/ })
   }
 
@@ -681,5 +683,29 @@ export class MobileCanvasController implements PDFCanvasController {
     const textbox = new fabric.Text(text, options);
     (textbox as never as FabricObject).attrs = { type: 'textbox' }
     this.canvas.add(textbox)
+  }
+
+  getScrollInfo (): { ratio: number; thumbRatio: number; hasScroll: boolean } {
+    const zoom = this.canvas.getZoom()
+    const canvasH = this.canvas.getHeight()
+    const totalH = this.boundary.bottom * zoom
+    const maxScroll = Math.max(0, totalH - canvasH)
+    const currentScroll = Math.max(0, -((this.canvas.viewportTransform ?? [])[5] ?? 0))
+    const ratio = maxScroll > 0 ? Math.min(1, currentScroll / maxScroll) : 0
+    const thumbRatio = totalH > 0 ? Math.max(0.05, canvasH / totalH) : 1
+    return { ratio, thumbRatio, hasScroll: maxScroll > 0 }
+  }
+
+  scrollToRatio (ratio: number): void {
+    const zoom = this.canvas.getZoom()
+    const canvasH = this.canvas.getHeight()
+    const totalH = this.boundary.bottom * zoom
+    const maxScroll = Math.max(0, totalH - canvasH)
+    const newVpt = [...(this.canvas.viewportTransform || [])]
+    newVpt[5] = -(ratio * maxScroll)
+    const { vpt } = this.moveViewportIntoBoundary(newVpt)
+    this.canvas.setViewportTransform(vpt)
+    this.canvas.requestRenderAll()
+    this.updateCurrentPage()
   }
 }
