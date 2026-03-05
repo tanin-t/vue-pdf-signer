@@ -53,6 +53,12 @@ export class MobileCanvasController implements PDFCanvasController {
     tool: 'pen'
   }
 
+  twoFingerScrolling = {
+    isScrolling: false,
+    lastMidX: 0,
+    lastMidY: 0
+  }
+
   orientation = 'landscape' as 'landscape' | 'portrait'
 
   pages = [] as fabric.Image[]
@@ -160,16 +166,29 @@ export class MobileCanvasController implements PDFCanvasController {
     }
 
     this.canvas.on('mouse:move:before', (opt) => {
-      // console.log('mouse:move:before', e)
-      // if (!opt.pointer) {
-      //   throw new Error('`opt` is not TouchEvent')
-      // }
-
       const evt = opt.e as never as TouchEvent
       if (evt.touches.length === 2) {
         const p1 = { x: evt.touches[0].clientX, y: evt.touches[0].clientY }
         const p2 = { x: evt.touches[1].clientX, y: evt.touches[1].clientY }
         this.pinchZoom(p1, p2)
+
+        if (this.twoFingerScrolling.isScrolling) {
+          const midX = (p1.x + p2.x) / 2
+          const midY = (p1.y + p2.y) / 2
+          const deltaX = midX - this.twoFingerScrolling.lastMidX
+          const deltaY = midY - this.twoFingerScrolling.lastMidY
+
+          const vpt = [...(this.canvas.viewportTransform || [])]
+          vpt[4] += deltaX
+          vpt[5] += deltaY
+          const { vpt: boundedVpt } = this.moveViewportIntoBoundary(vpt)
+          this.canvas.setViewportTransform(boundedVpt)
+          this.canvas.requestRenderAll()
+          this.updateCurrentPage()
+
+          this.twoFingerScrolling.lastMidX = midX
+          this.twoFingerScrolling.lastMidY = midY
+        }
       }
     })
 
@@ -191,6 +210,13 @@ export class MobileCanvasController implements PDFCanvasController {
 
       if (evt.touches.length === 2) {
         this.canvas.selection = false
+        this.dragging.isDragging = false
+
+        if (this.drawing.isDrawing) {
+          this.twoFingerScrolling.isScrolling = true
+          this.twoFingerScrolling.lastMidX = (evt.touches[0].clientX + evt.touches[1].clientX) / 2
+          this.twoFingerScrolling.lastMidY = (evt.touches[0].clientY + evt.touches[1].clientY) / 2
+        }
       }
     })
 
@@ -225,6 +251,7 @@ export class MobileCanvasController implements PDFCanvasController {
       }
 
       this.pinching.lastDistance = 0
+      this.twoFingerScrolling.isScrolling = false
     })
   }
 
