@@ -25,6 +25,9 @@
     "types",
     "src"
   ],
+  "resolutions": {
+    "@achrinza/node-ipc": "9.2.5"
+  },
   "scripts": {
     "dev": "vite",
     "serve": "vite",
