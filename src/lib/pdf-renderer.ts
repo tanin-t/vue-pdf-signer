@@ -1,5 +1,4 @@
 import { FabricObject } from '@/types/fabric'
-import { PDFDimensionTransformer } from '@/utils'
 import { fabric } from 'fabric'
 import _ from 'lodash'
 import { PDFDocument, PDFImage, degrees } from 'pdf-lib'
@@ -76,15 +75,64 @@ export class PDFController {
 
     for (let i = 0; i < pdfDoc.getPageCount(); i++) {
       const pdfPage = pdfDoc.getPage(i)
-      const fabricPage = annotationGroup[i].page
+      const fabricPage = annotationGroup[i].page as fabric.Image
       const pageSignatures = annotationGroup[i].signatures
       const pageImages = annotationGroup[i].images
       const pageTextBoxes = annotationGroup[i].textboxes
 
       // Check the PDF page's rotation metadata
-      const pageRotation = pdfPage.getRotation().angle
+      const pageRotation = ((pdfPage.getRotation().angle % 360) + 360) % 360
+      const { width: pdfWidth, height: pdfHeight } = pdfPage.getSize()
+      const pageLeft = fabricPage.left
+      const pageTop = fabricPage.top
 
-      const tr = new PDFDimensionTransformer(fabricPage as fabric.Image, pdfPage)
+      if (pageLeft === undefined || pageTop === undefined) {
+        throw new Error('fabricPage has not top/left')
+      }
+
+      const isQuarterTurn = pageRotation === 90 || pageRotation === 270
+      const scale = isQuarterTurn
+        ? pdfHeight / fabricPage.getScaledWidth()
+        : pdfWidth / fabricPage.getScaledWidth()
+      const displayHeight = isQuarterTurn ? pdfWidth : pdfHeight
+
+      const getDrawOptions = (obj: fabric.Object) => {
+        if (obj.left === undefined || obj.top === undefined) {
+          throw new Error('obj has not top/left')
+        }
+
+        const xFromLeft = (obj.left - pageLeft) * scale
+        const yFromTop = (obj.top - pageTop) * scale
+        const width = obj.getScaledWidth() * scale
+        const height = obj.getScaledHeight() * scale
+
+        const coordsFromBottomLeft = {
+          x: xFromLeft,
+          y: displayHeight - (yFromTop + height)
+        }
+
+        let x = coordsFromBottomLeft.x
+        let y = coordsFromBottomLeft.y
+
+        switch (pageRotation) {
+          case 90:
+            x = pdfWidth - coordsFromBottomLeft.y
+            y = coordsFromBottomLeft.x
+            break
+          case 180:
+            x = pdfWidth - coordsFromBottomLeft.x
+            y = pdfHeight - coordsFromBottomLeft.y
+            break
+          case 270:
+            x = coordsFromBottomLeft.y
+            y = pdfHeight - coordsFromBottomLeft.x
+            break
+          default:
+            break
+        }
+
+        return { x, y, width, height }
+      }
 
       for (const sig of pageSignatures) {
         const pdfImage = await this.getPDFImage(pdfDoc, sig.toDataURL({
@@ -92,52 +140,18 @@ export class PDFController {
           enableRetinaScaling: false,
           multiplier: 1
         }))
-        const coords = tr.getPDFCoords(sig)
-        const sigWidth = tr.getPDFLength(sig.getScaledWidth())
-        const sigHeight = tr.getPDFLength(sig.getScaledHeight())
-
-        if (pageRotation === 180) {
-          // PDF has 180° rotation
-          const { width, height } = pdfPage.getSize()
-
-          pdfPage.drawImage(pdfImage, {
-            x: width - coords.x,
-            y: height - coords.y + sigHeight,
-            width: sigWidth,
-            height: sigHeight,
-            rotate: degrees(180)
-          })
-        } else if (pageRotation === 90) {
-          // PDF has 90° clockwise rotation
-          // Best working formula: swap axes
-          // Note: Vertical positions are swapped (known limitation)
-          pdfPage.drawImage(pdfImage, {
-            x: coords.y,
-            y: coords.x,
-            width: sigWidth,
-            height: sigHeight,
-            rotate: degrees(90)
-          })
-        } else if (pageRotation === 270) {
-          // PDF has 270° clockwise rotation
-          const { width, height } = pdfPage.getSize()
-
-          pdfPage.drawImage(pdfImage, {
-            x: width - coords.y,
-            y: height - coords.x,
-            width: sigWidth,
-            height: sigHeight,
-            rotate: degrees(270)
-          })
-        } else {
-          // No rotation (0°)
-          pdfPage.drawImage(pdfImage, {
-            x: coords.x,
-            y: coords.y - sigHeight,
-            width: sigWidth,
-            height: sigHeight
-          })
+        const { x, y, width, height } = getDrawOptions(sig)
+        const drawOptions: { x: number, y: number, width: number, height: number, rotate?: ReturnType<typeof degrees> } = {
+          x,
+          y,
+          width,
+          height
         }
+        if (pageRotation !== 0) {
+          drawOptions.rotate = degrees(pageRotation)
+        }
+
+        pdfPage.drawImage(pdfImage, drawOptions)
       }
 
       for (const img of pageImages) {
@@ -146,46 +160,18 @@ export class PDFController {
           enableRetinaScaling: false,
           multiplier: 1
         }))
-        const coords = tr.getPDFCoords(img)
-        const imgWidth = tr.getPDFLength(img.getScaledWidth())
-        const imgHeight = tr.getPDFLength(img.getScaledHeight())
-
-        if (pageRotation === 180) {
-          const { width, height } = pdfPage.getSize()
-
-          pdfPage.drawImage(pdfImage, {
-            x: width - coords.x,
-            y: height - coords.y + imgHeight,
-            width: imgWidth,
-            height: imgHeight,
-            rotate: degrees(180)
-          })
-        } else if (pageRotation === 90) {
-          pdfPage.drawImage(pdfImage, {
-            x: coords.y,
-            y: coords.x,
-            width: imgWidth,
-            height: imgHeight,
-            rotate: degrees(90)
-          })
-        } else if (pageRotation === 270) {
-          const { width, height } = pdfPage.getSize()
-
-          pdfPage.drawImage(pdfImage, {
-            x: width - coords.y,
-            y: height - coords.x,
-            width: imgWidth,
-            height: imgHeight,
-            rotate: degrees(270)
-          })
-        } else {
-          pdfPage.drawImage(pdfImage, {
-            x: coords.x,
-            y: coords.y - imgHeight,
-            width: imgWidth,
-            height: imgHeight
-          })
+        const { x, y, width, height } = getDrawOptions(img)
+        const drawOptions: { x: number, y: number, width: number, height: number, rotate?: ReturnType<typeof degrees> } = {
+          x,
+          y,
+          width,
+          height
         }
+        if (pageRotation !== 0) {
+          drawOptions.rotate = degrees(pageRotation)
+        }
+
+        pdfPage.drawImage(pdfImage, drawOptions)
       }
 
       for (const textbox of pageTextBoxes) {
@@ -194,46 +180,18 @@ export class PDFController {
           enableRetinaScaling: false,
           multiplier: 1
         }))
-        const coords = tr.getPDFCoords(textbox)
-        const textWidth = tr.getPDFLength(textbox.getScaledWidth())
-        const textHeight = tr.getPDFLength(textbox.getScaledHeight())
-
-        if (pageRotation === 180) {
-          const { width, height } = pdfPage.getSize()
-
-          pdfPage.drawImage(pdfImage, {
-            x: width - coords.x,
-            y: height - coords.y + textHeight,
-            width: textWidth,
-            height: textHeight,
-            rotate: degrees(180)
-          })
-        } else if (pageRotation === 90) {
-          pdfPage.drawImage(pdfImage, {
-            x: coords.y,
-            y: coords.x,
-            width: textWidth,
-            height: textHeight,
-            rotate: degrees(90)
-          })
-        } else if (pageRotation === 270) {
-          const { width, height } = pdfPage.getSize()
-
-          pdfPage.drawImage(pdfImage, {
-            x: width - coords.y,
-            y: height - coords.x,
-            width: textWidth,
-            height: textHeight,
-            rotate: degrees(270)
-          })
-        } else {
-          pdfPage.drawImage(pdfImage, {
-            x: coords.x,
-            y: coords.y - textHeight,
-            width: textWidth,
-            height: textHeight
-          })
+        const { x, y, width, height } = getDrawOptions(textbox)
+        const drawOptions: { x: number, y: number, width: number, height: number, rotate?: ReturnType<typeof degrees> } = {
+          x,
+          y,
+          width,
+          height
         }
+        if (pageRotation !== 0) {
+          drawOptions.rotate = degrees(pageRotation)
+        }
+
+        pdfPage.drawImage(pdfImage, drawOptions)
       }
     }
 
