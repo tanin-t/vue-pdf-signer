@@ -24,6 +24,9 @@ read -r response
 
 # Check the value of $response
 if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
+  # Login to npm
+  npm login
+
   # Build the library
   yarn build-lib
 
