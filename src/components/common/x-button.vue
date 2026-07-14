@@ -5,6 +5,7 @@
       :size="iconSize"
       :path="icon"
       :style="{ color: color }"
+      :class="{ 'white-button': color === 'rgba(255,255,255,1)' }"
     />
     <span
       v-show="showButtonText"
@@ -84,5 +85,12 @@ export default Vue.extend({
 
 .icon-button:active {
   background: #cccccc;
+}
+
+.white-button {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #bdbdbd;
+  border-radius: 100%;
 }
 </style>
