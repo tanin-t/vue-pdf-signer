@@ -33766,6 +33766,9 @@ var pO = function() {
   return e("button", r._g(r._b({
     staticClass: "icon-button"
   }, "button", r.$attrs, !1), r.$listeners), [e("x-icon", {
+    class: {
+      "white-button": r.color === "rgba(255,255,255,1)"
+    },
     style: {
       color: r.color
     },
@@ -33928,7 +33931,7 @@ var wO = function() {
     staticStyle: {
       "margin-left": "12px"
     }
-  }, [r._v("Color")]), r._l(["rgba(0,0,0,1)", "rgba(255,0,0,1)", "rgba(0,0,255,1)", "rgba(252,186,3,1)", "rgba(255,192,203,1)", "rgba(5,194,2,1)"], function(i) {
+  }, [r._v("Color")]), r._l(["rgba(0,0,0,1)", "rgba(255,255,255,1)", "rgba(255,0,0,1)", "rgba(0,0,255,1)", "rgba(252,186,3,1)", "rgba(255,192,203,1)", "rgba(5,194,2,1)"], function(i) {
     return e("x-button", {
       key: i,
       staticClass: "square",
@@ -33968,7 +33971,7 @@ var CO = /* @__PURE__ */ tn(
   SO,
   !1,
   TO,
-  "35fe32b6",
+  "070c3e9d",
   null,
   null
 );
